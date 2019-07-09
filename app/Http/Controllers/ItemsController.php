@@ -7,6 +7,7 @@ use App\Item;
 use App\Helpers;
 use App\Configuration;
 use Auth;
+use App\Nationality;
 
 class ItemsController extends Controller
 {   
@@ -78,5 +79,12 @@ class ItemsController extends Controller
     public function players()
     {
         return file_get_contents(env('EA_PLAYERS'));
+    }
+
+    public function nationalities()
+    {
+        $nationalities = Nationality::all();
+
+        return $nationalities;
     }
 }

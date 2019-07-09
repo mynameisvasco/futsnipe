@@ -262,10 +262,12 @@ class SnipePlayers extends Command
                                         $transaction = new Transaction();
                                         $transaction->asset_id = $item->asset_id;
                                         $transaction->name = $item->name;
-                                        $transaction->coins = $item->buyNowPrice;
+                                        $transaction->coins = $item_result->buyNowPrice;
                                         $transaction->type = "Buy";
                                         $transaction->account_id = $account->id;
-                                        $account->coins -= $item->buyNowPrice;
+                                        $transaction->save();
+                                        $account->coins -= $item_result->buyNowPrice;
+                                        $account->save();
                                     }
                                     else
                                     {

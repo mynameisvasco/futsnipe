@@ -27,6 +27,8 @@ Route::get('/configurations', 'ConfigurationsController@index')->name('configura
 Route::post('/items/store', 'ItemsController@store')->name('items.store');
 Route::get('/items/players', 'ItemsController@players')->name('items.players');
 Route::get('/items/{id}/delete', 'ItemsController@delete')->name('items.delete');
+Route::get('/items/nationalities', 'ItemsController@nationalities')->name('items.nationalities');
+
 
 //Transactions
 

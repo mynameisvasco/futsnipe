@@ -43,7 +43,11 @@
                                     <p>{{$transaction->name}}</p>
                                 </div>
                                 <div class="col-3">
-                                    <p>{{$transaction->created_at}}</p>
+                                    <p id="transaction{{$transaction->id}}"></p>
+                                    <script>
+                                        var date = new Date("{{$transaction->created_at}}")
+                                        document.getElementById('transaction{{$transaction->id}}').innerHTML = timeSince(date) + " ago"
+                                    </script>
                                 </div>
                             </div>
                             <hr style="background-color:#ECEDF0; height:1px; border:0; width:100%;" class="mt-0">
