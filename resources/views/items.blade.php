@@ -134,7 +134,7 @@
         {
             player_name = document.getElementById('player_name').value.toLowerCase();
             console.log(player_name.length)
-            if(player_name.length > 3)
+            if(player_name.length > 4)
             {
                 document.getElementById("results_div_players").innerHTML="";
                 

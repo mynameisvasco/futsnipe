@@ -43,6 +43,20 @@ class ConfigurationsController extends Controller
 
     public function index()
     {
+        //Detected if user has configuration already, if not creates it with default values
+        $configuration = Configuration::where('user_id', Auth::user()->id)->first();
+        if(isset($configuration) == 0)
+        {
+            //Creates a new configuration for current user
+            $configuration = new Configuration();
+            $configuration->rpm = 6;
+            $configuration->snipe_cooldown = 60;
+            $configuration->price_update_cooldown = 15;
+            $configuration->buy_percentage = 90;
+            $configuration->sell_percentage = 95;
+            $configuration->user_id = Auth::user()->id;
+            $configuration->save();
+        }
         $pageName = 'Configurations';
         $configuration = Configuration::where('user_id', Auth::user()->id)->first();
         return view('configurations')->with('pageName', $pageName)

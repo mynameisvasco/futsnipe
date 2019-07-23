@@ -8,6 +8,7 @@ use App\Account;
 use FUTApi\Core;
 use FUTApi\FutError;
 use Carbon\Carbon;
+use Log;
 
 class AccountsLogin extends Command
 {
@@ -16,7 +17,7 @@ class AccountsLogin extends Command
      *
      * @var string
      */
-    protected $signature = 'accounts:cron';
+    protected $signature = 'accounts:cron {account_id}';
 
     /**
      * The console command description.
@@ -42,53 +43,59 @@ class AccountsLogin extends Command
      */
     public function handle()
     {
-        //For each user in database get their fifa accounts
-        $accounts = Account::where('status', '<>', '0')->whereNull('phishingToken')->orderByRaw("RAND()")->get();
-        foreach($accounts as $account)
+        $account = Account::find($this->argument('account_id'));
+
+        //If there is no account with id provided
+        if(empty($account))
         {
-            $account = Account::find($account->id);
-            $backup_codes = explode(',', trim($account->backupCodes));
-            if($account->status != 0)
-            {
-                try 
-                {
-                    $fut = new Core(
-                        $account->email,
-                        $account->password,
-                        strtolower($account->platform),
-                        $backup_codes[array_rand($backup_codes, 1)],
-                        false,
-                        false,
-                        storage_path(
-                            'app/fut_cookies/'.md5($account->email)
-                        )
-                    );
-                    $login = $fut->login();
-                    $account->phishingToken = $login['auth']['phishing_token'];
-                    $account->personaId = $login['mass_info']['userInfo']['personaId'];
-                    $account->personaName = $login['mass_info']['userInfo']['personaName'];
-                    $account->nucleusId = $login['auth']['nucleus_id'];
-                    $account->clubName = $login['mass_info']['userInfo']['clubName'];
-                    $account->sessionId = $login['auth']['session_id'];
-                    $account->coins = $login['mass_info']['userInfo']['credits'];
-                    $account->tradepile_limit = $login['mass_info']['pileSizeClientData']['entries'][0]['value'];
-                    $account->dob = $login['auth']['dob'];
-                    $account->last_login = new Carbon;
-                    $account->status = 2;
-                    $account->status_reason = null;
-                    $account->save();
-                    $this->info("We updated ".$account->email." successfully!");
-                }
-                catch(FutError $exception) 
-                {
-                    $error = $exception->GetOptions();
-                    $account->status = '-1';
-                    $account->status_reason = $error['reason'];
-                    $account->last_login = new Carbon;
-                    $account->save();
-                    $this->info("Error ".$error['reason']." on account: ".$account->email);
-                }
-            }
+            $this->error("There is no account with ID->  ".$this->argument('account_id'));
+            Log::error("There is no account with ID->  ".$this->argument('account_id'));
+            die(); 
+        }
+
+        //If account isnt idle for a long time or with error there is no need to refresh session
+        if($account->status != -1 && $account->status != 0) die();
+
+        $backup_codes = explode(',', trim($account->backupCodes));
+        try 
+        {
+            $fut = new Core(
+                $account->email,
+                $account->password,
+                strtolower($account->platform),
+                $backup_codes[array_rand($backup_codes, 1)],
+                false,
+                false,
+                storage_path(
+                    'app/fut_cookies/'.md5($account->email)
+                )
+            );
+            $login = $fut->login();
+            $account->phishingToken = $login['auth']['phishing_token'];
+            $account->personaId = $login['mass_info']['userInfo']['personaId'];
+            $account->personaName = $login['mass_info']['userInfo']['personaName'];
+            $account->nucleusId = $login['auth']['nucleus_id'];
+            $account->clubName = $login['mass_info']['userInfo']['clubName'];
+            $account->sessionId = $login['auth']['session_id'];
+            $account->coins = $login['mass_info']['userInfo']['credits'];
+            $account->tradepile_limit = $login['mass_info']['pileSizeClientData']['entries'][0]['value'];
+            $account->dob = $login['auth']['dob'];
+            $account->last_login = new Carbon;
+            $account->status = 2;
+            $account->status_reason = null;
+            $account->save();
+            $this->info("We updated ".$account->email." successfully!");
+            Log::info("We updated ".$account->email." successfully!");
+        }
+        catch(FutError $exception) 
+        {
+            $error = $exception->GetOptions();
+            $account->status = '-1';
+            $account->status_reason = $error['reason'];
+            $account->last_login = new Carbon;
+            $account->save();
+            $this->error("Error ".$error['reason']." on account: ".$account->email);
+            Log::error("Error ".$error['reason']." on account: ".$account->email);
         }
     }
 }

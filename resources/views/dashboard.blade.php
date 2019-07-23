@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <div class="row align-items-center no-gutters">
                             <div class="col mr-2">
-                                <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>TOTAL TRANSACTIONS</span></div>
+                                <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>Total transactions</span></div>
                                 <div class="text-dark font-weight-bold h5 mb-0"><span>{{$totalTransactions}}</span></div>
                             </div>
                             <div class="col-auto"><i class="fas fa-shopping-cart fa-2x text-gray-300"></i></div>
@@ -24,7 +24,7 @@
                     <div class="card-body">
                         <div class="row align-items-center no-gutters">
                             <div class="col mr-2">
-                                <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>TOTAL EARNINGS</span></div>
+                                <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>Total earnings</span></div>
                                 <div class="text-dark font-weight-bold h5 mb-0"><span>{{$totalEarnings}}</span></div>
                             </div>
                             <div class="col-auto"><i class="fas fa-coins fa-2x text-gray-300"></i></div>
@@ -54,7 +54,7 @@
                     <div class="card-body">
                         <div class="row align-items-center no-gutters">
                             <div class="col mr-2">
-                                <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>ACCOUNTS</span></div>
+                                <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>Accounst</span></div>
                                 <div class="text-dark font-weight-bold h5 mb-0"><span>{{$totalAccounts}}</span></div>
                             </div>
                             <div class="col-auto"><i class="fas fa-user-lock fa-2x text-gray-300"></i></div>
