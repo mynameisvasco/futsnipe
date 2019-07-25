@@ -106,7 +106,6 @@ class SnipePlayers extends Command
         //Check Trade pile
         $tradepile = $fut->tradepile();
         $tradepile = json_decode(json_encode($tradepile));
- 
         foreach($tradepile->auctionInfo as $item)
         {
             $this->info(json_encode($tradepile));
@@ -122,11 +121,11 @@ class SnipePlayers extends Command
                     $account->status -= 2;
                     $account->save();
                 }
- 
+
                 //Save the transaction in database and update account coins
                 $transaction = new Transaction();
-                $transaction->asset_id = $item->assetId;
-                $transaction->name = $item->name;
+                $transaction->asset_id = $item->itemData->assetId;
+                $transaction->name = "Needs to be fixed";
                 $transaction->coins = $item->buyNowPrice;
                 $transaction->type = "Sell";
                 $transaction->account_id = $account->id;
@@ -295,8 +294,8 @@ class SnipePlayers extends Command
                                 {
                                     //Buy the player
                                     $fut->bid($item_result->tradeId, $item_result->buyNowPrice);
-                                    $this->info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " minutes.");
-                                    Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " minutes.");
+                                    $this->info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
+                                    Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                    
                                     //Save the transaction in database and update account coins
                                     $transaction = new Transaction();

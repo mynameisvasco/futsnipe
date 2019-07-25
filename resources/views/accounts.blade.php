@@ -96,7 +96,8 @@
                                     @endif
                                 </div>
                                 <div class="col-3">
-                                    <a href="/accounts/{{$account->id}}/refresh" class="btn btn-sm btn-primary text-white mb-3"> Refresh session</a>
+                                    <a href="/accounts/{{$account->id}}/refresh" class="btn btn-sm btn-primary text-white mb-3"> Refresh session</a> &nbsp;
+                                    <a href="/accounts/{{$account->id}}/stop" class="btn btn-sm btn-danger text-white mb-3"> Stop</a>
                                 </div>
                             </div>
                             <hr style="background-color:#ECEDF0; height:1px; border:0; width:100%;" class="mt-0">

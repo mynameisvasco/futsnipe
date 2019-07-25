@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Account;
+use Artisan;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +26,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        // Snipe players using the accounts that have status = 2 (READY TO SNIPE)
+        $schedule->call(function () {
+            $accounts = Account::where('status', 2)->get();
+            foreach($accounts as $account)
+            {
+                Artisan::call('snipeplayers:cron ' . $account->id);
+            }
+        })->everyMinute();
+
+        $schedule->call(function () {
+            $accounts = Account::where('status', -1)->get();
+            foreach($accounts as $account)
+            {
+                Artisan::call('accounts:cron ' . $account->id);
+            }
+        })->everyFifteenMinutes();
     }
 
     /**

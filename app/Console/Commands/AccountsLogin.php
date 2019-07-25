@@ -53,8 +53,8 @@ class AccountsLogin extends Command
             die(); 
         }
 
-        //If account isnt idle for a long time or with error there is no need to refresh session
-        if($account->status != -1 && $account->status != 0) die();
+        //If account is being used don't refresh
+        if($account->status == 2) die();
 
         $backup_codes = explode(',', trim($account->backupCodes));
         try 
@@ -90,7 +90,7 @@ class AccountsLogin extends Command
         catch(FutError $exception) 
         {
             $error = $exception->GetOptions();
-            $account->status = '-1';
+            $account->status = -1;
             $account->status_reason = $error['reason'];
             $account->last_login = new Carbon;
             $account->save();

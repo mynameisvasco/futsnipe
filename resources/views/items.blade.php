@@ -76,33 +76,30 @@
                 </div>
             @else
                 @foreach($items as $item)
-                    <div class="col-md-6 col-lg-6 col-xl-4 mb-4">
-                        <div class="card shadow border-left-primary py-2">
-                            <div class="card-body">
-                                <div class="row align-items-center no-gutters">
-                                    <div class="col mr-2">
-                                        <div class="text-dark font-weight-bold h5 mb-1"><span>{{ $item->name }}</span></div>
-                                        <div class="text-uppercase text-primary font-weight-bold text-xs mb-1">
-                                            <span class="text-primary">
-                                                <i class="fab fa-xbox"></i> {{ $item->xbox_buy_bin }} - </i>
-                                                <i class="fab fa-playstation"></i> {{ $item->ps_buy_bin }}  - </i>
-                                                <i class="fa fa-desktop"></i> {{ $item->pc_buy_bin }}  </i>
-                                            </span>
-                                            <br>
-                                            <span class="text-primary"><i class="fa fa-star"></i> {{ $item->rating }}</span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <a class="btn btn-sm btn-danger btn-icon-split" href="/items/{{$item->id}}/delete">
-                                                <span class="text-white-50 icon"><i class="fas fa-trash"></i></span>
-                                                <span class="text-white text">Remove</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                            <img style="overflow:hidden; z-index:1;position: relative;left:0;top: 0;" src="{{ env('EA_PLAYER_CARD') }}@if($item->rating > 74)1_1_3.png @elseif($item->rating > 64 && $item->rating < 75)1_1_2.png @else()1_1_1.png @endif">
-                                            <img style="overflow:hidden;  top:15px;position:absolute; z-index:1;" class="rounded-circle" src="https://www.easports.com/fifa/ultimate-team/web-app/content/7D49A6B1-760B-4491-B10C-167FBC81D58A/2019/fut/items/images/mobile/portraits/{{$item->asset_id}}.png" width="80px">
-                                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 col-xl-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <p class="text-center fifa-card"><img src="/storage/fut_cards/{{$item->asset_id}}.png" width="70%"></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <p class="text-center mb-1"><b>Buy Price</b></p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-xbox"></i> {{$item->xbox_buy_bin}}</p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-playstation"></i> {{$item->ps_buy_bin}}</p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fa fa-desktop"></i> {{$item->pc_buy_bin}}</p>
                                 </div>
+                                <div class="mb-4">
+                                    <p class="text-center mb-1"><b>Sell Price</b></p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-xbox"></i> {{$item->xbox_sell_bin}}</p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-playstation"></i> {{$item->ps_sell_bin}}</p>
+                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fa fa-desktop"></i> {{$item->pc_sell_bin}}</p>
+                                </div>
+                                <p class="text-center mb-1">
+                                    <a class="btn btn-sm btn-primary" style="width:80px;" href="/items/{{$item->id}}/edit"> Edit</a>
+                                </p>
+                                <p class="text-center">
+                                    <a class="btn btn-sm btn-danger" style="width:80px;" href="/items/{{$item->id}}/delete"> Remove</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -111,6 +108,84 @@
         </div>
     </div>
     <script>
+        var playerCardsJSON = ""
+        function getPlayerCardsList(assetId)
+        {
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            } else {  // code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function() {
+                if (this.readyState==4 && this.status==200) 
+                {
+                    playerCardsJSON = JSON.parse(this.responseText)
+                    console.log(playerCardsJSON)
+                    generateCardImg()
+                }
+            }
+            xmlhttp.open("GET","/items/player_cards/"+assetId,true);
+            xmlhttp.send();
+        }
+
+        function generateCardImg()
+        {
+            token = document.querySelector('meta[name="csrf-token"]').content;
+
+            for(var i = 0; i < playerCardsJSON['items'].length; i++)
+            {
+                if (window.XMLHttpRequest) {
+                    // code for IE7+, Firefox, Chrome, Opera, Safari
+                    xmlhttp=new XMLHttpRequest()
+                } else {  // code for IE6, IE5
+                    new ActiveXObject("Microsoft.XMLHTTP")
+                }
+                xmlhttp.onreadystatechange=function() {
+                    if (this.readyState==4 && this.status==200) 
+                    {
+                        showPlayerCardsList()
+                    }
+                }
+
+                let playerName = playerCardsJSON['items'][i]['commonName'] != "" ? playerCardsJSON['items'][i]['commonName'] : playerCardsJSON['items'][i]['lastName']
+                let params = `name=`+ playerName + 
+                `&rating=`+ playerCardsJSON['items'][i]['rating'] +
+                `&club=`+ playerCardsJSON['items'][i]['club']['id'] +
+                `&assetId=`+ playerCardsJSON['items'][i]['baseId'] +
+                `&nationality=`+ playerCardsJSON['items'][i]['nation']['id'] + 
+                `&position=`+ playerCardsJSON['items'][i]['position'] + 
+                `&rarityId=`+ playerCardsJSON['items'][i]['rarityId'] +
+                `&definitionId=`+ playerCardsJSON['items'][i]['id']
+
+                xmlhttp.open("POST","/items/card/generate", false)
+                xmlhttp.setRequestHeader('X-CSRF-TOKEN', token)
+                xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded")
+                xmlhttp.send(params);
+            }
+        }
+
+        function showPlayerCardsList()
+        {
+            resultsDiv = document.getElementById('results_div_players')
+            resultsDiv.innerHTML = ""
+
+            for(var i = 0; i < playerCardsJSON['items'].length; i++)
+            {
+                resultsDiv.innerHTML += 
+                `
+                <div class="fifa-card col-sm-4 col-md-3 mb-4">
+                    <form action="/items/store" method="POST">
+                        @csrf
+                        <input type="hidden" name="item" value='`+ JSON.stringify(playerCardsJSON['items'][i]) +`'> 
+                        <input type="image" src="storage/fut_cards/`+ playerCardsJSON['items'][i]['id'] + `.png" width="100%">
+                    </form>
+                </div>
+                `
+            }
+        }
+
+
         var playersJSON = ""
         function getPlayerList()
         {
@@ -134,12 +209,11 @@
         {
             player_name = document.getElementById('player_name').value.toLowerCase();
             console.log(player_name.length)
-            if(player_name.length > 4)
+            if(player_name.length > 3)
             {
                 document.getElementById("results_div_players").innerHTML="";
                 
                 var legendsPlayerTargets = []
-
                 for(var i = 0; i < playersJSON['LegendsPlayers'].length; i++)
                 {
                     if(playersJSON['LegendsPlayers'][i]['f'].toLowerCase().includes(player_name))
@@ -158,11 +232,9 @@
                         }
                     }
                 }
-
                 legendsPlayerTargets.sort(function(a, b){
                     return b.r - a.r;
                 })
-
                 for(var i = 0; i < legendsPlayerTargets.length; i++)
                 {
                     if(legendsPlayerTargets[i]['c'] != null)
@@ -188,13 +260,9 @@
                                         </h6>
                                     </div>
                                     <div class="col-12">
-                                        <form action="/items/store" method="post">
-                                            {!! csrf_field() !!}
-                                            <input type="hidden" name="item" value='`+ JSON.stringify(legendsPlayerTargets[i]) +`'>
-                                            <h6 class="text-center">
-                                                <button type="submit" class="btn btn-primary"> Add Item</button>
-                                            </h6>
-                                        </form>
+                                        <h6 class="text-center">
+                                            <button type="submit" onclick="getPlayerCardsList(`+ legendsPlayerTargets[i]['id'] +`)" class="btn btn-primary"> Select</button>
+                                        </h6>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +270,6 @@
                     </div>
                     `
                 }
-
                 var playerTargets = []
                 for(var i = 0; i < playersJSON['Players'].length; i++)
                 {
@@ -223,11 +290,9 @@
                     }
                     
                 }
-
                 playerTargets.sort(function(a, b){
                     return b.r - a.r;
                 })
-
                 for(var i = 0; i < playerTargets.length; i++)
                 {
                     if(playerTargets[i]['c'] != null)
@@ -253,13 +318,9 @@
                                         </h6>
                                     </div>
                                     <div class="col-12">
-                                        <form action="/items/store" method="post">
-                                            {!! csrf_field() !!}
-                                            <input type="hidden" name="item" value='`+ JSON.stringify(playerTargets[i]) +`'>
-                                            <h6 class="text-center">
-                                                <button type="submit" class="btn btn-primary"> Add Item</button>
-                                            </h6>
-                                        </form>
+                                        <h6 class="text-center">
+                                            <button type="submit" onclick="getPlayerCardsList(`+ playerTargets[i]['id'] +`)" class="btn btn-primary"> Select</button>
+                                        </h6>
                                     </div>
                                 </div>
                             </div>
@@ -269,7 +330,6 @@
                 }
             }
         }
-
         var nationalitiesJSON = ""
         function getNationalityList()
         {
@@ -293,7 +353,6 @@
         {
             document.getElementById("results_div_nationalities").innerHTML="";
             nationality_name = document.getElementById('nationality_name').value.toLowerCase();
-
             var nationalities = []
             if(nationality_name.length > 2)
             {

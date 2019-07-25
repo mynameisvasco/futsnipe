@@ -1,7 +1,9 @@
 
 function timeSince(date) 
 {
-    var seconds = Math.floor((new Date() - date) / 1000);
+    var now = new Date();
+    var nowUTC = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds())
+    var seconds = Math.floor((nowUTC - date) / 1000);
 
     var interval = Math.floor(seconds / 31536000);
 

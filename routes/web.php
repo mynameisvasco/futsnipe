@@ -27,14 +27,18 @@ Route::get('/accounts', 'AccountsController@index')->name('accounts');
 //Items routes
 Route::post('/items/store', 'ItemsController@store')->name('items.store');
 Route::get('/items/players', 'ItemsController@players')->name('items.players');
+Route::get('/items/player_cards/{assetId}', 'ItemsController@playerCards')->name('items.player_cards');
 Route::get('/items/{id}/delete', 'ItemsController@delete')->name('items.delete');
 Route::get('/items/nationalities', 'ItemsController@nationalities')->name('items.nationalities');
+Route::post('/items/card/generate', 'ItemsController@generateCard')->name('items.card.generate');
 
 //Account Routes
 Route::post('/accounts/new', 'AccountsController@store')->name('accounts.store');
 Route::get('/accounts/{id}/refresh', 'AccountsController@refresh')->name('accounts.refresh');
+Route::get('/accounts/{id}/stop', 'AccountsController@stop')->name('accounts.stop');
 
 //Transactions
 
 //Configurations
 Route::post('/configurations/{id}/save', 'ConfigurationsController@update')->name('configurations.update');
+Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');

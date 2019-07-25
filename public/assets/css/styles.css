@@ -6,3 +6,39 @@
 {
     border: 0px solid black;
 }
+@font-face {
+    font-family: 'DinProCondensedBold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('DIN Pro Medium'), url('/fonts/DINPro-CondBold.otf') format('woff');
+}
+@font-face {
+    font-family: 'DinProCondensedMedium';
+    font-style: normal;
+    font-weight: normal;
+    src: local('DIN Pro Medium'), url('/fonts/DINPro-CondMedium.otf') format('woff');
+}
+
+.fifa-card{
+    position: relative;
+    transform-origin: 0 0;
+    transition: all 0.5s ease;
+}
+
+.fifa-card:hover{
+    transition: all 0.5s ease;
+    transform-origin: top left;
+    transform: scale(1.05);
+}
+
+.fifa-card:active{
+    transition: all 0.5s ease;
+    transform-origin: top left;
+    transform: scale(1.05);
+}
+
+.fifa-card:focus{
+    transition: all 0.5s ease;
+    transform-origin: top left;
+    transform: scale(1.05);
+}
