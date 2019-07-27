@@ -6,56 +6,40 @@
         </div>
         <div class="row">
             @if(count($transactions) == 0)
-            <div class="col">
-                <p>No transactions yet, try to buy or sell an item first.</p>
-            </div>
+                <div class="col">
+                    <p>No transactions yet, try to buy or sell an item first.</p>
+                </div>
             @else
-                <div class="col-12">
+                @foreach($transactions as $transaction)
+                <div class="col-12 col-sm-6 col-lg-6 col-xl-2 mb-4">
                     <div class="card shadow">
-                        <div class="card-header pb-0">
-                            <div class="row">
-                                <div class="col-3">
-                                    <p class="text-primary font-weight-bold"><i class="fa fa-user"></i> Account</p>
-                                </div>
-                                <div class="col-3">
-                                    <p class="text-primary font-weight-bold"><i class="fa fa-coins"></i> Coins</p>
-                                </div>
-                                <div class="col-3">
-                                    <p class="text-primary font-weight-bold"><i class="fa fa-box"></i> Item</p>
-                                </div>
-                                <div class="col-3">
-                                    <p class="text-primary font-weight-bold"><i class="fa fa-calendar"></i> Date</p>
-                                </div>
+                        <div class="card-body">
+                            <div class="col-md-10 offset-md-1 mt-4" style="border-bottom:1px solid #EDF2F7;">
+                                <p class="text-center fifa-card"><img src="/storage/fut_cards/{{$transaction->asset_id}}.png" width="75%"></p>
                             </div>
-                        </div>
-                        <div class="card-body pb-0 pt-1">
-                            @foreach($transactions as $transaction)
-                            <div class="row mt-3">
-                                <div class="col-3">
-                                    <p class="ml-2">{{$transaction->account->email}}</p>
-                                </div>
-                                <div class="col-3">
-                                    @if($transaction->type == 'Buy') <p class="text-danger">- {{$transaction->coins}}</p>
-                                    @else <p class="text-success">+ {{$transaction->coins}}</p>
+                            <div class="col-md-10 offset-md-1 mt-4">
+                                <div class="mb-2">
+                                    @if($transaction->type == 'Buy') <p class="text-center text-danger"><i class="fa fa-coins"></i> -{{$transaction->coins}}</p>
+                                        @else <p class="text-center text-success"><i class="fa fa-coins"></i> +{{$transaction->coins}}</p>
                                     @endif
                                 </div>
-                                <div class="col-3">
-                                    <p>{{$transaction->name}}</p>
-                                </div>
-                                <div class="col-3">
-                                    <p id="transaction{{$transaction->id}}"></p>
+                                <div class="mb-2">
+                                    <p class="text-center" id="transaction{{$transaction->id}}"></p>
                                     <script>
                                         var date = new Date("{{$transaction->created_at}}")
                                         document.getElementById('transaction{{$transaction->id}}').innerHTML = timeSince(date) + " ago"
                                     </script>
                                 </div>
+                                <div class="mb-2">
+                                    <p class="text-center">{{$transaction->account->email}}</p>
+                                </div>
                             </div>
-                            <hr style="background-color:#ECEDF0; height:1px; border:0; width:100%;" class="mt-0">
-                            @endforeach
                         </div>
                     </div>
                 </div>
+                @endforeach
             @endif
         </div>
     </div> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.0.0/cropper.js"></script>
 @endsection

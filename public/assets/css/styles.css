@@ -21,24 +21,49 @@
 
 .fifa-card{
     position: relative;
-    transform-origin: 0 0;
+    transform-origin: center center;
     transition: all 0.5s ease;
 }
 
 .fifa-card:hover{
     transition: all 0.5s ease;
-    transform-origin: top left;
+    transform-origin: center center;
     transform: scale(1.05);
 }
 
 .fifa-card:active{
     transition: all 0.5s ease;
-    transform-origin: top left;
+    transform-origin: center center;
     transform: scale(1.05);
 }
 
 .fifa-card:focus{
     transition: all 0.5s ease;
-    transform-origin: top left;
+    transform-origin: center center;
     transform: scale(1.05);
 }
+
+.transaction-item-name
+{
+    height:100px;
+    background-size:cover;
+    background-position: 10px 250px;
+}
+
+.dropdown-item:active
+{
+    color:white !important;
+}
+
+.card-divider
+{
+    background: #EDF2F7;
+    height:1px;
+}
+
+.bg-gradient-primary {
+    background-color: #4e73df;
+    background-image: linear-gradient(180deg,#4e73df 10%,#224abe);
+    background-size: cover;
+}
+

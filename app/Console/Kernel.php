@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Account;
 use Artisan;
+use Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -26,9 +27,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Snipe players using the accounts that have status = 2 (READY TO SNIPE)
+        // Snipe players using the accounts that have status = 2 (READY TO SNIPE) and status = 0 (COOLDOWN)
         $schedule->call(function () {
-            $accounts = Account::where('status', 2)->get();
+            $accounts = Account::where('status', 2)->orWhere('status', 3)->get();
             foreach($accounts as $account)
             {
                 Artisan::call('snipeplayers:cron ' . $account->id);

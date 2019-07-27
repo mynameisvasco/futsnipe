@@ -51,105 +51,132 @@ class SnipePlayers extends Command
         $configuration = Configuration::where('user_id', $account->user_id)->first();
         $user = User::find($account->user_id);
         if(!isset($account)) $this->error("No account found with id " + $this->argument('account_id'));
-       
-        try
-        {
-            $fut = new Core(
-                $account->email,
-                $account->password,
-                $account->platform,
-                null,
-                false,
-                false,
-                storage_path(
-                    'app/fut_cookies/' . md5($account->email)
-                ));
- 
-            $fut->setSession(
-                $account->personaId,
-                $account->nucleusId,
-                $account->phishingToken,
-                $account->sessionId,
-                date("Y-m", strtotime($account->dob))
-            );
- 
-            //Set account status = 1 (Accounts in use)
-            $account->status = 1;
-            $account->save();
-        }
-        catch(FutError $e)
-        {
-            $error = $e->GetOptions();
- 
-            $account->phishingToken = null;
-            $account->sessionId = null;
-            $account->nucleusId = null;
-            $account->personaId = null;
-            $account->clubName = null;
-            $account->coins = null;
-            $account->dob = null;
-            $account->tradepile_limit = null;
-            $account->last_login = null;
-            $account->status = -1;
-            $account->status_reason = $error['reason'];
-            $account->save();
- 
-            $this->error("We have an error logging in: ".$error['reason']);
-            Log::error("We have an error logging in: ".$error['reason']);
-           
-        }
- 
- 
-        $this->info("Logged in with success as " . $account->email);
-        Log::info("Logged in with success as " . $account->email);
- 
-        //Check Trade pile
-        $tradepile = $fut->tradepile();
-        $tradepile = json_decode(json_encode($tradepile));
-        foreach($tradepile->auctionInfo as $item)
-        {
-            $this->info(json_encode($tradepile));
-            //If trade is closed mark as sold
-            if($item->tradeState == 'closed')
-            {
-                try
-                {
-                    $fut->removeSold($item->tradeId);
-                }
-                catch(FutError $e)
-                {
-                    $account->status -= 2;
-                    $account->save();
-                }
 
-                //Save the transaction in database and update account coins
-                $transaction = new Transaction();
-                $transaction->asset_id = $item->itemData->assetId;
-                $transaction->name = "Needs to be fixed";
-                $transaction->coins = $item->buyNowPrice;
-                $transaction->type = "Sell";
-                $transaction->account_id = $account->id;
-                $transaction->save();
-                $account->coins -= $item->buyNowPrice;
-                $account->save();
-            }
-        }
-       
-        $requestsDone = 0;
-        if(Carbon::parse($account->started)->diffInMinutes(Carbon::now()) > $configuration->snipe_cooldown)
+        //Check if accounts needs to cooldown
+        if($account->minutesRunning >= $configuration->snipe_cooldown)
         {
-            //Update account status = 0 (Accounts in cooldown)
-            $account->status = 0;
-            $account->save();
-            $this->error('Account is on cooldown.');
+            //Set status to stopped if not stopped
+            if($account->status != 3)
+            {
+                $account->status = 3;
+                $account->save();
+                $this->info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown);
+                Log::info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown);
+                die();
+            }
+            //If cooldown time passed start again
+            elseif($account->minutesRunning == $configuration->snipe_cooldown * 2)
+            {
+                //Reset the minutesRunning timer
+                $account->minutesRunning = 0;
+                $account->status = 2;
+                $account->save();
+                $this->info($account->email . ' cooldown time is over ');
+                Log::info($account->email . ' cooldown time is over');
+                die();
+            }
         }
         else
         {
+            try
+            {
+                $fut = new Core(
+                    $account->email,
+                    $account->password,
+                    $account->platform,
+                    null,
+                    false,
+                    false,
+                    storage_path(
+                        'app/fut_cookies/' . md5($account->email)
+                    ));
+
+                $fut->setSession(
+                    $account->personaId,
+                    $account->nucleusId,
+                    $account->phishingToken,
+                    $account->sessionId,
+                    date("Y-m", strtotime($account->dob))
+                );
+
+                //Set account status = 1 (Accounts in use)
+                $account->status = 1;
+                $account->save();
+            }
+            catch(FutError $e)
+            {
+                $error = $e->GetOptions();
+
+                $account->phishingToken = null;
+                $account->sessionId = null;
+                $account->nucleusId = null;
+                $account->personaId = null;
+                $account->clubName = null;
+                $account->coins = null;
+                $account->dob = null;
+                $account->tradepile_limit = null;
+                $account->last_login = null;
+                $account->status = -1;
+                $account->status_reason = $error['reason'];
+                $account->save();
+
+                $this->error("We have an error logging in: ".$error['reason']);
+                Log::error("We have an error logging in: ".$error['reason']);
+                
+            }
+
+
+            $this->info("Logged in with success as " . $account->email);
+            Log::info("Logged in with success as " . $account->email);
+
+            $startedTime = Carbon::now();
+
+            //Check Trade pile
+            $tradepile = $fut->tradepile();
+            $tradepile = json_decode(json_encode($tradepile));
+            foreach($tradepile->auctionInfo as $item)
+            {
+                $this->info(json_encode($tradepile));
+                //If trade is closed mark as sold
+                if($item->tradeState == 'closed')
+                {
+                    try
+                    {
+                        $fut->removeSold($item->tradeId);
+                    }
+                    catch(FutError $e)
+                    {
+                        $account->status -= 2;
+                        $account->save();
+                    }
+
+                    //Save the transaction in database and update account coins
+                    $transaction = new Transaction();
+                    $transaction->asset_id = $item->itemData->assetId;
+                    $transaction->name = "Needs to be fixed";
+                    $transaction->coins = $item->buyNowPrice;
+                    $transaction->type = "Sell";
+                    $transaction->account_id = $account->id;
+                    $transaction->save();
+                    $account->coins += $item->buyNowPrice;
+                    $account->save();
+                }
+            }
+            
+            $requestsDone = 0;
+
             while($requestsDone < $configuration->rpm)
             {
+
+                if(Carbon::now()->diffInMinutes($startedTime) >= 1)
+                {
+                    $account->minutesRunning += 1;
+                    $account->save();
+                }
+
                 //Get all user snipe items
                 $items = Item::where('user_id', $user->id)->get();
- 
+
                 //For each item in database that belongs to current user
                 foreach($items as $item)
                 {
@@ -175,7 +202,7 @@ class SnipePlayers extends Command
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
- 
+
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -188,15 +215,15 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
- 
+
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->xbox_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->xbox_buy_bin);
-                           
+                            
                         }
                     }
- 
+
                     if($account->platform == 'ps')
                     {
                         $randomBid = rand(14000000, 15000000);
@@ -218,7 +245,7 @@ class SnipePlayers extends Command
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
- 
+
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -231,15 +258,15 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
-                           
+                            
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->ps_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->ps_buy_bin);
-                           
+                            
                         }
                     }
- 
+
                     if($account->platform == 'pc')
                     {
                         $randomBid = rand(14000000, 15000000);
@@ -261,7 +288,7 @@ class SnipePlayers extends Command
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
- 
+
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -274,15 +301,15 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
- 
+
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->pc_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->pc_buy_bin);
-                           
+                            
                         }
                     }
- 
+
                     $items_results = json_decode(json_encode($items_results));
                     if(count($items_results->auctionInfo) > 0)
                     {
@@ -296,7 +323,7 @@ class SnipePlayers extends Command
                                     $fut->bid($item_result->tradeId, $item_result->buyNowPrice);
                                     $this->info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
-                                   
+                                    
                                     //Save the transaction in database and update account coins
                                     $transaction = new Transaction();
                                     $transaction->asset_id = $item->asset_id;
@@ -307,18 +334,18 @@ class SnipePlayers extends Command
                                     $transaction->save();
                                     $account->coins -= $item_result->buyNowPrice;
                                     $account->save();
- 
+
                                     //Sell the player
                                     if($account->platform == 'xbox')
                                     {
                                         try
                                         {
                                             $fut->sendToTradepile($item_result->itemData->id, $safe = false);
- 
+
                                             //Check Trade pile
                                             $tradepile = $fut->tradepile();
                                             $tradepile = json_decode(json_encode($tradepile));
- 
+
                                             foreach($tradepile->auctionInfo as $itemTr)
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
@@ -343,11 +370,11 @@ class SnipePlayers extends Command
                                         try
                                         {
                                             $fut->sendToTradepile($item_result->itemData->id, $safe = false);
- 
+
                                             //Check Trade pile
                                             $tradepile = $fut->tradepile();
                                             $tradepile = json_decode(json_encode($tradepile));
- 
+
                                             foreach($tradepile->auctionInfo as $itemTr)
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
@@ -372,11 +399,11 @@ class SnipePlayers extends Command
                                         try
                                         {
                                             $fut->sendToTradepile($item_result->itemData->id, $safe = false);
- 
+
                                             //Check Trade pile
                                             $tradepile = $fut->tradepile();
                                             $tradepile = json_decode(json_encode($tradepile));
- 
+
                                             foreach($tradepile->auctionInfo as $itemTr)
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
@@ -402,12 +429,12 @@ class SnipePlayers extends Command
                                     $this->error("Not enought coins.");
                                     Log::error("Not enought coins.");
                                 }
- 
+
                             }
                             catch(FutError $e)
                             {
                                 $error = $e->GetOptions();
- 
+
                                 $account->phishingToken = null;
                                 $account->sessionId = null;
                                 $account->nucleusId = null;
@@ -420,10 +447,10 @@ class SnipePlayers extends Command
                                 $account->status = -1;
                                 $account->status_reason = $error['reason'];
                                 $account->save();
- 
+
                                 $this->error("We have an error trying to bid the selected player" . $error['reason']);
                                 Log::error("We have an error trying to bid the selected player" . $error['reason']);
-                               
+                                
                             }
                         }
                     }
@@ -434,11 +461,14 @@ class SnipePlayers extends Command
                     }
                     $account->status = 2;
                     $account->save();
- 
+
                     $requestsDone++;
                     sleep(round(60/$configuration->rpm));
                 }
             }
         }
+        //This script run once per minute so we can increase counter at the end of the script
+        $account->minutesRunning += 1;
+        $account->save();
     }
 }

@@ -30,6 +30,19 @@ class ItemsController extends Controller
             ->with('items', $items);
     }
  
+    public function update(Request $request)
+    {
+        $item = Item::find($request->input('id'));
+        $item->xbox_buy_bin = $request->input('xbox_buy_bin');
+        $item->ps_buy_bin = $request->input('ps_buy_bin');
+        $item->pc_buy_bin = $request->input('pc_buy_bin');
+        $item->xbox_sell_bin = $request->input('xbox_sell_bin');
+        $item->ps_sell_bin = $request->input('ps_sell_bin');
+        $item->pc_sell_bin = $request->input('pc_sell_bin');
+        $item->save();
+
+        return redirect('/items')->with('notify', array('message' => 'You updated an item with success', 'icon' => 'icon-check', 'type' => 'success'));
+    }
     public function delete($id)
     {
         $item = Item::find($id);
@@ -120,6 +133,12 @@ class ItemsController extends Controller
         if(file_exists(storage_path('app/public/fut_cards/'. $definitionId .'.png'))) return 'card already generated';
 
         $cardsBg = array(
+            //CHAMPIONS LEAGUE TEAM OF THE TOURNMENT
+            '70'=> ['https://www.easports.com/fifa/ultimate-team/web-app/content/7D49A6B1-760B-4491-B10C-167FBC81D58A/2019/fut/items/images/backgrounds/itemCompanionBGs/large/cards_bg_e_1_70_0.png', '#f5f5f5'],
+            //CANIBAL
+            '72'=> ['https://www.easports.com/fifa/ultimate-team/web-app/content/7D49A6B1-760B-4491-B10C-167FBC81D58A/2019/fut/items/images/backgrounds/itemCompanionBGs/large/cards_bg_e_1_72_0.png', '#ffe632' ],
+            //ICON
+            '12'=> ['https://www.easports.com/fifa/ultimate-team/web-app/content/7D49A6B1-760B-4491-B10C-167FBC81D58A/2019/fut/items/images/backgrounds/itemCompanionBGs/large/cards_bg_e_1_12_0.png', '#625217'],
             //FUTURE STARS
             '71'=> ['https://www.easports.com/fifa/ultimate-team/web-app/content/7D49A6B1-760B-4491-B10C-167FBC81D58A/2019/fut/items/images/backgrounds/itemCompanionBGs/large/cards_bg_e_1_71_0.png', '#c0ff36'],
             //FLASHBACK

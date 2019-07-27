@@ -20,6 +20,7 @@ class CreateAccountsTable extends Migration
             $table->string('platform');
             $table->string('backupCodes')->nullable()->default(NULL);
             $table->integer('user_id');
+            $table->integer('minutesRunning')->default(0);
             $table->string('phishingToken')->nullable()->default(NULL);
             $table->string('personaId')->nullable()->default(NULL);
             $table->string('personaName')->nullable()->default(NULL);

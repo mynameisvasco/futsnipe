@@ -1,16 +1,82 @@
 @extends('layouts.app')
 @section("content")
+<div class="modal" id="editItemModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+    
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Edit item</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="col-12 mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <p class="text-center"><img id="editItemImg" src="" width="80%"></p>
+                        </div>
+                        <div class="col-md-7">
+                            <form class="user" action="" id="editItemForm" method="POST"> 
+                                {!! csrf_field() !!}
+                                <input type="hidden" value="" id="item_id" name="id">
+                                <h5><b>XBOX</b></h5>
+                                <div class="row mb-5">
+                                    <div class="col-md-6">
+                                        <label class="ml-1"> Buy BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="xbox_buy_bin" name="xbox_buy_bin">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="ml-1">Sell BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="xbox_sell_bin" name="xbox_sell_bin">
+                                    </div>
+                                </div>
+                                <hr>
+                                <h5><b>Playstation</b></h5>
+                                <div class="row mb-5">
+                                    <div class="col-md-6">
+                                        <label class="ml-1"> Buy BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="ps_buy_bin" name="ps_buy_bin">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="ml-1">Sell BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="ps_sell_bin" name="ps_sell_bin">
+                                    </div>
+                                </div>
+                                <hr>
+                                <h5><b>PC</b></h5>
+                                <div class="row mb-5">
+                                    <div class="col-md-6">
+                                        <label class="ml-1"> Buy BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="pc_buy_bin" name="pc_buy_bin">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="ml-1">Sell BIN</label>
+                                        <input class="form-control form-control-user" type="number" value="" id="pc_sell_bin" name="pc_sell_bin">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <p class="text-right"><button class="btn btn-primary" type="submit">Save</button></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- The Modal -->
 <div class="modal" id="newItemModal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-    
-        <!-- Modal Header -->
-        <div class="modal-header">
-            <h4 class="modal-title">Add items</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Add items</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
             <!-- Modal body -->
             <div class="modal-body">
                 <div class="col-12 mb-4">
@@ -36,7 +102,7 @@
                                 </div>
                                 <div class="col-12 mt-4">
                                     <div id="results_div_players" class="row">
-                
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -54,8 +120,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="league" role="tabpanel" aria-labelledby="league-tab">...</div>
-                        </div>
+                        <div class="tab-pane fade" id="league" role="tabpanel" aria-labelledby="league-tab">...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,30 +142,41 @@
                 </div>
             @else
                 @foreach($items as $item)
-                    <div class="col-sm-6 col-md-6 col-lg-6 col-xl-3">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <p class="text-center fifa-card"><img src="/storage/fut_cards/{{$item->asset_id}}.png" width="70%"></p>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-4">
-                                    <p class="text-center mb-1"><b>Buy Price</b></p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-xbox"></i> {{$item->xbox_buy_bin}}</p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-playstation"></i> {{$item->ps_buy_bin}}</p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fa fa-desktop"></i> {{$item->pc_buy_bin}}</p>
+                    <div class="col-12 col-sm-6 col-lg-6 col-xl-3">
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-around">
+                                    <div style="margin-left:90%;" class="dropdown no-arrow">
+                                        <button class="btn btn-link btn-sm dropdown-toggle" data-toggle="dropdown" type="button">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu shadow dropdown-menu-right animated--fade-in" role="menu">
+                                            <a class="dropdown-item" role="presentation" href="/items/{{$item->id}}/delete"> Remove</a>
+                                            <a class="dropdown-item" role="presentation" onclick="editItem({{$item->id}})"> Edit</a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-4">
-                                    <p class="text-center mb-1"><b>Sell Price</b></p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-xbox"></i> {{$item->xbox_sell_bin}}</p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fab fa-playstation"></i> {{$item->ps_sell_bin}}</p>
-                                    <p class="text-center mb-1" style="font-size:12px;"><i class="fa fa-desktop"></i> {{$item->pc_sell_bin}}</p>
+                                <div class="row align-items-center">
+                                    <div class="col-md-10 offset-md-1 pb-2" style="border-bottom:1px solid #EDF2F7;">
+                                        <p class="text-center fifa-card"><img src="/storage/fut_cards/{{$item->asset_id}}.png" width="65%"></p>
+                                    </div>
+                                    <div class="col-md-12  mt-4">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="text-center mb-2"><b>Buy Price</b></h6>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fab fa-xbox"></i> {{$item->xbox_buy_bin}}</p>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fab fa-playstation"></i> {{$item->ps_buy_bin}}</p>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fa fa-desktop"></i> {{$item->pc_buy_bin}}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-center mb-2"><b>Sell Price</b></h6>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fab fa-xbox"></i> {{$item->xbox_sell_bin}}</p>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fab fa-playstation"></i> {{$item->ps_sell_bin}}</p>
+                                                <p class="text-center mb-1" style="font-size:13px;"><i class="fa fa-desktop"></i> {{$item->pc_sell_bin}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="text-center mb-1">
-                                    <a class="btn btn-sm btn-primary" style="width:80px;" href="/items/{{$item->id}}/edit"> Edit</a>
-                                </p>
-                                <p class="text-center">
-                                    <a class="btn btn-sm btn-danger" style="width:80px;" href="/items/{{$item->id}}/delete"> Remove</a>
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -108,6 +185,23 @@
         </div>
     </div>
     <script>
+        function editItem(id)
+        {
+            $("#editItemModal").modal()
+            let itemToEdit = JSON.parse("{{$items}}".replace(/&quot;/g, '"'))
+            item = itemToEdit.find(item => item.id === id)
+
+            document.getElementById('editItemImg').src = "/storage/fut_cards/"+item['asset_id'] + '.png'
+            document.getElementById('editItemForm').action = "/items/"+ item['id'] + "/update"
+            document.getElementById('xbox_buy_bin').value = item['xbox_buy_bin']
+            document.getElementById('ps_buy_bin').value = item['ps_buy_bin']
+            document.getElementById('pc_buy_bin').value = item['pc_buy_bin']
+            document.getElementById('xbox_sell_bin').value = item['xbox_sell_bin']
+            document.getElementById('ps_sell_bin').value = item['ps_sell_bin']
+            document.getElementById('pc_sell_bin').value = item['pc_sell_bin']
+            document.getElementById('item_id').value = item['id']
+        }
+
         var playerCardsJSON = ""
         function getPlayerCardsList(assetId)
         {

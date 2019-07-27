@@ -58,7 +58,7 @@
             @else
                 <div class="col-12">
                     <div class="card shadow">
-                        <div class="card-header pb-0">
+                        <div class="card-header pb-0 pt-3">
                             <div class="row">
                                 <div class="col-3">
                                     <p class="text-primary font-weight-bold"><i class="fa fa-envelope"></i> Email</p>
@@ -75,7 +75,7 @@
                         </div>
                         <div class="card-body pb-0 pt-1">
                             @foreach($accounts as $account)
-                            <div class="row mt-3">
+                            <div class="row mt-4 mb-1">
                                 <div class="col-3">
                                     <p class="ml-2">{{$account->email}}</p>
                                 </div>
