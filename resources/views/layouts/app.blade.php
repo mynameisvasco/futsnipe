@@ -6,15 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Dashboard</title>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{env('APP_URL')}}/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
-    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
-    <link rel="stylesheet" href="assets/fonts/line-awesome.min.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="{{env('APP_URL')}}/assets/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="{{env('APP_URL')}}/assets/fonts/line-awesome.min.css">
+    <link rel="stylesheet" href="{{env('APP_URL')}}/assets/css/styles.css">
+    <link rel="stylesheet" href="{{env('APP_URL')}}/assets/css/fifa-cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.js"></script>
-    <script src="js/main.js"></script>
+    <script src="{{env('APP_URL')}}/js/main.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="{{env('APP_URL')}}/assets/js/jquery.min.js"></script>
 
 </head>
 
@@ -26,7 +28,7 @@
                     <div class="sidebar-brand-icon rotate-n-15"><i class="la la-soccer-ball-o"></i></div>
                     <div class="sidebar-brand-text mx-3"><span>{{ env('APP_NAME') }}<br></span></div>
                 </a>
-                <hr class="sidebar-divider my-0">
+                <hr class=" my-0">
                 <ul class="nav navbar-nav text-light" id="accordionSidebar">
                     <li class="nav-item" role="presentation"><a class="nav-link @if($pageName == 'Dashboard') active @endif"" href="/dashboard"><i class="fas fa-rocket"></i><span>&nbsp; Dashboard</span></a></li>
                     <hr class="sidebar-divider">
@@ -46,12 +48,14 @@
                     <li class="nav-item" role="presentation"><a class="nav-link @if($pageName == 'Logs') active @endif" href="/logs"><i class="fas fa-terminal"></i><span>&nbsp;Logs</span></a></li>
                     <hr class="sidebar-divider">
                 </ul>
-                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+                <div class="text-center d-none d-md-inline">
+                    <button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button>
+                </div>
             </div>
         </nav>
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top toggled">
                     <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
                             <li class="nav-item dropdown no-arrow" role="presentation">
@@ -62,21 +66,21 @@
                                     </a>
                                     <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu">
                                         <a class="dropdown-item" role="presentation" href="/logout"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a>
+                                    </div>
                                 </li>
                             </li>
                         </ul>
                     </div>
                 </nav>
                 @yield('content')
-                </div>
-                <footer class="bg-white sticky-footer">
-                    <div class="container my-auto">
-                        <div class="text-center my-auto copyright"><span>Copyright © FUTSnipe 2019</span></div>
-                    </div>
-                </footer>
             </div>
-            <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © FUTSnipe 2019</span></div>
+                </div>
+            </footer>
         </div>
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
     </div>
     @if(session('notify'))
         <script type="text/javascript">
@@ -102,12 +106,11 @@
             </script>
         @endforeach
     @endif
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/chart.min.js"></script>
-    <script src="assets/js/bs-charts.js"></script>
+    <script src="{{env('APP_URL')}}/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{env('APP_URL')}}/assets/js/chart.min.js"></script>
+    <script src="{{env('APP_URL')}}/assets/js/bs-charts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
-    <script src="assets/js/theme.js"></script>
+    <script src="{{env('APP_URL')}}/assets/js/theme.js"></script>
     <script>
     </script>
 </body>

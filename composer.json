@@ -12,6 +12,7 @@
         "fideloper/proxy": "^4.0",
         "inkedcurtis/fut-api": "^2.9",
         "intervention/image": "^2.5",
+        "irazasyed/telegram-bot-sdk": "^2.0",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
         "nesbot/carbon": "^2.20",

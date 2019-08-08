@@ -73,9 +73,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body pb-0 pt-1">
+                        <div class="card-body pt-1">
                             @foreach($accounts as $account)
-                            <div class="row mt-4 mb-1">
+                            <div class="row mt-4 pb-1 mb-1">
                                 <div class="col-3">
                                     <p class="ml-2">{{$account->email}}</p>
                                 </div>

@@ -7,6 +7,7 @@ use App\Transaction;
 use App\Item;
 use Auth;
 use App\Account;
+use App\Stats;
 
 class DashboardController extends Controller
 {
@@ -28,22 +29,22 @@ class DashboardController extends Controller
     public function index()
     {
         $pageName = "Dashboard";
-        $transactions = Transaction::orderBy('created_at', 'DESC')->get();
-        $latestTransactions = [];
-        $totalTransactions = 0;
-        $totalEarnings = 0;
+        $transactions = Transaction::with('fifaCard')->orderBy('created_at', 'DESC')->limit(6)->get();
+        $stats = Stats::latest()->limit(6)->get();
         $totalItems = count(Item::where('user_id', Auth::user()->id)->get());
         $totalAccounts = count(Account::where('user_id', Auth::user()->id)->get());
-        foreach($transactions as $transaction)
+        $totalEarnings = 0;
+        $totalTransactions = 0;
+        foreach($stats as $stat)
         {
-            if($transaction->type == 'Buy') $totalEarnings -= $transaction->coins;
-            else $totalEarnings += $transaction->coins;
-            if($transaction->account->user_id == Auth::user()->id) $totalTransactions++;
+            $totalEarnings += $stat->coins_balance;
+            $totalTransactions += $stat->total_transactions;
         }
-        return view('dashboard')->with('pageName', $pageName)->with('totalTransactions', $totalTransactions)
-            ->with('totalEarnings', $totalEarnings)
-            ->with('totalItems', $totalItems)
+        return view('dashboard')->with('pageName', $pageName)->with('totalItems', $totalItems)
             ->with('totalAccounts', $totalAccounts)
-            ->with('transactions', $transactions);
+            ->with('transactions', $transactions)
+            ->with('stats', $stats)
+            ->with('totalEarnings', $totalEarnings)
+            ->with('totalTransactions', $totalTransactions);
     }
 }

@@ -10,4 +10,14 @@ class Transaction extends Model
     {
         return $this->belongsTo('App\Account');
     }
+
+    public function item()
+    {
+        return $this->belongsTo('App\Item', 'definition_id', 'definition_id');
+    }
+
+    public function fifaCard()
+    {
+        return $this->belongsTo('App\FifaCard', 'definition_id', 'definition_id');
+    }
 }

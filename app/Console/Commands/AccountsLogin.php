@@ -9,6 +9,8 @@ use FUTApi\Core;
 use FUTApi\FutError;
 use Carbon\Carbon;
 use Log;
+use Telegram;
+use App\Configuration;
 
 class AccountsLogin extends Command
 {
@@ -44,7 +46,7 @@ class AccountsLogin extends Command
     public function handle()
     {
         $account = Account::find($this->argument('account_id'));
-
+        $configuration = Configuration::where('user_id', $account->user->id)->first();
         //If there is no account with id provided
         if(empty($account))
         {
@@ -52,9 +54,6 @@ class AccountsLogin extends Command
             Log::error("There is no account with ID->  ".$this->argument('account_id'));
             die(); 
         }
-
-        //If account is being used don't refresh
-        if($account->status == 2) die();
 
         $backup_codes = explode(',', trim($account->backupCodes));
         try 
@@ -84,16 +83,24 @@ class AccountsLogin extends Command
             $account->status = 2;
             $account->status_reason = null;
             $account->save();
-            $this->info("We updated ".$account->email." successfully!");
-            Log::info("We updated ".$account->email." successfully!");
+            $this->info("Logged in with success as " . $account->email);
+            Log::info("Logged in with success as " . $account->email);
         }
         catch(FutError $exception) 
         {
             $error = $exception->GetOptions();
             $account->status = -1;
+            
             $account->status_reason = $error['reason'];
             $account->last_login = new Carbon;
             $account->save();
+            if($configuration->telegram_channel != "")
+            {
+                Telegram::sendMessage([
+                    'chat_id' => '@'.$configuration->telegram_channel, 
+                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                ]);
+            }
             $this->error("Error ".$error['reason']." on account: ".$account->email);
             Log::error("Error ".$error['reason']." on account: ".$account->email);
         }

@@ -20,9 +20,20 @@ class TransactionsController extends Controller
     public function index()
     {
         $pageName = "Transactions";
-        $transactions = Transaction::all();
+
+        $transactions = Transaction::with('fifaCard')->orderBy('created_at', 'DESC')->paginate(12);
 
         return view('transactions')->with('pageName', $pageName)
-            ->with('transactions', $transactions);
+            ->with(['transactions' => $transactions]);
+    }
+
+    public function indexDate(Request $request)
+    {
+        $pageName = "Transactions";
+
+        $transactions = Transaction::whereDate('created_at', '=' , date($request->input('date')))->paginate(12);
+
+        return view('transactions')->with('pageName', $pageName)
+            ->with(['transactions' => $transactions]);
     }
 }

@@ -26,6 +26,7 @@ class CreateItemsTable extends Migration
             $table->integer('rating');
             $table->string('name');
             $table->integer('user_id');
+            $table->bigInteger('definition_id');
             $table->timestamps();
         });
     }

@@ -1,0 +1,437 @@
+
+@font-face {
+    font-family: 'DIN Pro Condensed Regular';
+    src: url('/fonts/DINPro-Cond.otf');
+}
+@font-face {
+    font-family: 'DIN Pro Condensed Bold';
+    src: url('/fonts/DINPro-CondBold.otf');
+}
+
+.bronze
+{
+    background: url('/assets/cards/bronze.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #2b2217;
+}
+
+.bronzeif
+{
+    background: url('/assets/cards/bronzeif.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #bb9266;
+}
+
+.bronzerare
+{
+    background: url('/assets/cards/bronzerare.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #3a2717;
+}
+
+.carnibal
+{
+    background: url('/assets/cards/carnibal.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #ffe632;
+}
+
+.champions-teamoftournment
+{
+    background: url('/assets/cards/champions-teamoftournment.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.champions-manofmatch
+{
+    background: url('/assets/cards/champions-manofmatch.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.champions-rare
+{
+    background: url('/assets/cards/champions-rare.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.europaleague-manofmatch
+{
+    background: url('/assets/cards/europaleague-manofmatch.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.europaleague-teamoftournment
+{
+    background: url('/assets/cards/europaleague-teamoftournment.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.europaleague-live
+{
+    background: url('/assets/cards/europaleague-live.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f39200;
+}
+
+.flashback
+{
+    background: url('/assets/cards/flashback.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #e4d7bc;
+}
+
+.futchampions
+{
+    background: url('/assets/cards/futchampions.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #e3cf83;
+}
+
+.futmas
+{
+    background: url('/assets/cards/futmas.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.futties
+{
+    background: url('/assets/cards/futties.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f9e574;
+}
+
+.futtiesnominated
+{
+    background: url('/assets/cards/futtiesnominated.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.futurestars
+{
+    background: url('/assets/cards/futurestars.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #c0ff36;
+}
+
+.gold
+{
+    background: url('/assets/cards/gold.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #443a22;
+}
+
+.goldif
+{
+    background: url('/assets/cards/goldif.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #bb9266;
+}
+
+.goldrare
+{
+    background: url('/assets/cards/goldrare.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #46390c;
+}
+
+.halloween
+{
+    background: url('/assets/cards/halloween.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #ff690d;
+}
+
+.headliners
+{
+    background: url('/assets/cards/headliners.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #fff;
+}
+
+.hero
+{
+    background: url('/assets/cards/hero.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #cbb8f9;
+}
+
+.icon
+{
+    background: url('/assets/cards/icon.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #625217;
+}
+
+.orange
+{
+    background: url('/assets/cards/orange.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #e6e6e6;
+}
+
+.premierleague-playerofmonth
+{
+    background: url('/assets/cards/premierleague-playerofmonth.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #05f1ff;
+}
+
+.sbcsummer
+{
+    background: url('/assets/cards/sbcsummer.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.silver
+{
+    background: url('/assets/cards/silver.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #26292a;
+}
+
+.silverif
+{
+    background: url('/assets/cards/silverif.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #b0bcc8;
+}
+
+.silverrare
+{
+    background: url('/assets/cards/silverrare.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #303536;
+}
+
+.specialitem
+{
+    background: url('/assets/cards/specialitem.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #12fcc6;
+}
+
+.tots
+{
+    background: url('/assets/cards/tots.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #eed170;
+}
+
+.toty
+{
+    background: url('/assets/cards/tots.png');
+    background-repeat: no-repeat;
+    background-size: 185px 281px;
+    background-position: center center;
+    color: #ebcd5b;
+}
+
+.card-badge {
+    position: absolute;
+    top: 114px;
+    left: 30px;
+    z-index: 11;
+}
+.card-badge img {
+    width: 32px;
+}
+
+.card-flag {
+    position: absolute;
+    top: 89px;
+    left: 33px;
+    z-index: 11;
+}
+
+.card-flag img {
+    width: 25px;
+}
+
+.card-position {
+    font-family: 'DIN Pro Condensed Regular';
+    font-size: 18px;
+    position: absolute;
+    top: 66px;
+    left: 28px;
+    width: 38px;
+    text-align: center;
+    z-index: 11;
+}
+
+.card-rating {
+    font-family: 'DIN Pro Condensed Regular';
+    font-size: 30px;
+    position: absolute;
+    top: 37px;
+    left: 28px;
+    width: 37px;
+    text-align: center;
+    z-index: 11;
+}
+
+
+
+.card-name {
+    font-family: 'DIN Pro Condensed Bold';
+    font-size: 20px;
+    position: absolute;
+    top: 152px;
+    left: 10px;
+    width: 165px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
+    z-index: 11;
+}
+
+.fifa-card
+{
+    margin: 0 auto;
+    position: relative;
+    width: 185px;
+    height: 281px;
+    text-transform: uppercase;
+    justify-content: center;
+    line-height: normal !important;
+    transition: all 0.3s ease;
+}
+
+.fifa-card:hover
+{
+    transform-origin: center center;
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+}
+
+.fifa-card:active
+{
+    transform-origin: center center;
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+}
+
+.fifa-card:focus
+{
+    transform-origin: center center;
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+}
+
+
+.card-face {
+    position: absolute;
+    right: 17px;
+    top: 40px;
+    overflow: hidden;
+    width: 110px;
+    height: 110px;
+}
+.card-face-inner {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.card-face-inner img {
+    height: 110px;
+}
+
+.card-button {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
+.card-button:active {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
+.card-button:focus {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}

@@ -19,30 +19,6 @@
     src: local('DIN Pro Medium'), url('/fonts/DINPro-CondMedium.otf') format('woff');
 }
 
-.fifa-card{
-    position: relative;
-    transform-origin: center center;
-    transition: all 0.5s ease;
-}
-
-.fifa-card:hover{
-    transition: all 0.5s ease;
-    transform-origin: center center;
-    transform: scale(1.05);
-}
-
-.fifa-card:active{
-    transition: all 0.5s ease;
-    transform-origin: center center;
-    transform: scale(1.05);
-}
-
-.fifa-card:focus{
-    transition: all 0.5s ease;
-    transform-origin: center center;
-    transform: scale(1.05);
-}
-
 .transaction-item-name
 {
     height:100px;
@@ -67,3 +43,31 @@
     background-size: cover;
 }
 
+.page-link {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: 10px;
+    line-height: 1.25;
+    color: #4e73df;
+    border-radius: 7px;
+    background-color: #fff;
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+}
+
+/* On screens that are 600px or less, set the background color to olive */
+@media screen and (max-width: 768px) {
+    .sidebar.toggled {
+        width: 8.5rem !important;
+        min-height: 100vh;
+    }
+    .sidebar{
+        width: 0;
+        overflow: hidden;
+    }
+    .sidebar-divider
+    {
+        width:68%;
+    }
+}

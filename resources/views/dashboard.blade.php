@@ -63,9 +63,9 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-7 col-xl-8">
-                <div class="card shadow mb-4">
+        <div class="row mb-5">
+            <div class="col-lg-7 col-xl-8 mb-4">
+                <div class="card h-100 shadow">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="text-primary font-weight-bold m-0">Earnings Overview</h6>
                     </div>
@@ -82,171 +82,65 @@
                         <h6 class="text-primary font-weight-bold m-0">Latest Transactions</h6>
                     </div>
                     <div class="card-body">
-                        @if(count($transactions) > 0 )
-                        <script>
-                            function getNPrevDate(prevDays)
-                            {
-                                var prev_date = new Date();
-                                prev_date.setDate(prev_date.getDate() - prevDays);
-                                return prev_date.toISOString().split('T')[0];
-                            }
+                        <div class="container">
+                            <div class="row mt-3 align-items-center">
+                                <script>
+                                    function getNPrevDate(prevDays)
+                                    {
+                                        var prev_date = new Date();
+                                        prev_date.setDate(prev_date.getDate() - prevDays);
+                                        return prev_date.toISOString().split('T')[0];
+                                    }
 
-                            var days = [getNPrevDate(5), getNPrevDate(4), getNPrevDate(3), getNPrevDate(2), getNPrevDate(1), getNPrevDate(0)]
-                            var coinsBalance = [0,0,0,0,0,0]
-                        </script>
-                        @php $transactionLimit = 0; @endphp
-                        @foreach($transactions as $transaction)
-                            @if($transactionLimit >= 5)
-                                @if($transaction->type == 'Buy') 
+                                    var days = [getNPrevDate(5), getNPrevDate(4), getNPrevDate(3), getNPrevDate(2), getNPrevDate(1), getNPrevDate(0)]
+                                    var coinsBalance = [0,0,0,0,0,0]
+                                    var k = 5
+                                </script>
+                                @foreach($stats as $stat)
                                     <script>
-                                        if("{{$transaction->created_at}}".includes(days[0]))
-                                        {
-                                            coinsBalance[0] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[1]))
-                                        {
-                                            coinsBalance[1] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[2]))
-                                        {
-                                            coinsBalance[2] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[3]))
-                                        {
-                                            coinsBalance[3] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[4]))
-                                        {
-                                            coinsBalance[4] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[5]))
-                                        {
-                                            coinsBalance[5] -= {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[6]))
-                                        {
-                                            coinsBalance[6] -= {{$transaction->coins}}
-                                        }
+                                        coinsBalance[k] = "{{$stat->coins_balance}}"
+                                        k -= 1;
                                     </script>
-                                @else 
-                                    <script>
-                                        if("{{$transaction->created_at}}".includes(days[0]))
-                                        {
-                                            coinsBalance[0] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[1]))
-                                        {
-                                            coinsBalance[1] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[2]))
-                                        {
-                                            coinsBalance[2] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[3]))
-                                        {
-                                            coinsBalance[3] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[4]))
-                                        {
-                                            coinsBalance[4] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[5]))
-                                        {
-                                            coinsBalance[5] += {{$transaction->coins}}
-                                        }
-                                        else if("{{$transaction->created_at}}".includes(days[6]))
-                                        {
-                                            coinsBalance[6] += {{$transaction->coins}}
-                                        }
-                                    </script>
+                                @endforeach
+                                @if(count($transactions) > 0 )
+                                    @foreach($transactions as $transaction)
+                                        <div class="col-12 col-lg-6 b-2 mb-4">
+                                            <div class="fifa-card-dashboard fifa-card mb-2 {{$transaction->fifaCard->type}}">
+                                                <div class="card-face">
+                                                    <div class="card-face-inner">
+                                                        <img src="{{env('EA_PLAYERS_PIC')}}/{{$transaction->fifaCard->asset_id}}.png">
+                                                    </div>
+                                                </div>
+                                                <div class="card-badge">
+                                                    <img src="{{env('EA_CLUB_BADGE')}}/{{$transaction->fifaCard->club}}.png" alt="Badge">
+                                                </div>
+                                                <div class="card-flag">
+                                                    <img src="/flags/{{$transaction->fifaCard->nationality}}.png" alt="Nation">
+                                                </div>
+                                                <div class="card-rating">{{$transaction->fifaCard->rating}}</div>
+                                                <div class="card-name">{{$transaction->fifaCard->name}}</div>
+                                                <div class="card-position">{{$transaction->fifaCard->position}}</div>
+                                            
+                                            </div>  
+                                            <p id="transaction{{$transaction->id}}Time" class="text-center" style="font-size:12px;" ></p>
+                                            @if($transaction->type == 'Buy') 
+                                                <p class="text-danger text-center"><i class="fa fa-coins"></i> - {{$transaction->coins}}</p>
+                                                
+                                            @else 
+                                                <p class="text-success text-center"><i class="fa fa-coins"></i> + {{$transaction->coins}}</p>
+
+                                            @endif
+                                            <script>
+                                                var date = new Date("{{$transaction->created_at}}")
+                                                document.getElementById('transaction{{$transaction->id}}Time').innerHTML = timeSince(date) + " ago"
+                                            </script>
+                                        </div>                                        
+                                    @endforeach
+                                @else
+                                    <p>No transactions yet.</p>
                                 @endif
-                            @else
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <p>{{$transaction->name}}</p>
-                                    </div>
-                                    <div class="col-3">
-                                        @if($transaction->type == 'Buy') 
-                                            <p class="text-danger">- {{$transaction->coins}}</p>
-                                            <script>
-                                                if("{{$transaction->created_at}}".includes(days[0]))
-                                                {
-                                                    coinsBalance[0] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[1]))
-                                                {
-                                                    coinsBalance[1] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[2]))
-                                                {
-                                                    coinsBalance[2] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[3]))
-                                                {
-                                                    coinsBalance[3] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[4]))
-                                                {
-                                                    coinsBalance[4] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[5]))
-                                                {
-                                                    coinsBalance[5] -= {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[6]))
-                                                {
-                                                    coinsBalance[6] -= {{$transaction->coins}}
-                                                }
-                                            </script>
-                                        @else 
-                                            <p class="text-success">+ {{$transaction->coins}}</p>
-                                            <script>
-                                                if("{{$transaction->created_at}}".includes(days[0]))
-                                                {
-                                                    coinsBalance[0] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[1]))
-                                                {
-                                                    coinsBalance[1] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[2]))
-                                                {
-                                                    coinsBalance[2] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[3]))
-                                                {
-                                                    coinsBalance[3] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[4]))
-                                                {
-                                                    coinsBalance[4] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[5]))
-                                                {
-                                                    coinsBalance[5] += {{$transaction->coins}}
-                                                }
-                                                else if("{{$transaction->created_at}}".includes(days[6]))
-                                                {
-                                                    coinsBalance[6] += {{$transaction->coins}}
-                                                }
-                                            </script>
-                                        @endif
-                                    </div>
-                                    <div class="col-3">
-                                        <p id="transaction{{$transaction->id}}"></p>
-                                        <script>
-                                            var date = new Date("{{$transaction->created_at}}")
-                                            document.getElementById('transaction{{$transaction->id}}').innerHTML = timeSince(date) + " ago"
-                                        </script>
-                                    </div>
-                                </div>
-                                <hr style="background-color:#ECEDF0; height:1px; border:0; width:100%;" class="mt-0">
-                                @php $transactionLimit += 1; @endphp
-                            @endif
-                        @endforeach
-                        @else
-                            <p>No transactions yet.</p>
-                        @endif
+                            </div>                             
+                        </div>
                     </div>
                 </div>
             </div>

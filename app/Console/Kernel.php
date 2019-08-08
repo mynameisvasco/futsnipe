@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Account;
 use Artisan;
 use Log;
+use App\Transaction;
 
 class Kernel extends ConsoleKernel
 {
@@ -37,12 +38,13 @@ class Kernel extends ConsoleKernel
         })->everyMinute();
 
         $schedule->call(function () {
-            $accounts = Account::where('status', -1)->get();
-            foreach($accounts as $account)
+            $transactions = Transaction::all();
+            if(count($transactions) > 300)
             {
-                Artisan::call('accounts:cron ' . $account->id);
+                Transaction::latest()->skip(6)->delete();
+                Log::info("We deleted old transactions details from database");
             }
-        })->everyFifteenMinutes();
+        })->everyThirtyMinutes();
     }
 
     /**

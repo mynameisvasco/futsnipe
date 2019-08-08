@@ -10,4 +10,9 @@ class Account extends Model
     {
         return $this->hasMany('App\Transaction');
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

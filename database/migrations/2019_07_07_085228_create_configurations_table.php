@@ -20,6 +20,7 @@ class CreateConfigurationsTable extends Migration
             $table->integer('price_update_cooldown');
             $table->integer('buy_percentage');
             $table->integer('sell_percentage');
+            $table->string('telegram_channel')->default("");
             $table->integer('user_id');
             $table->timestamps();
         });

@@ -28,3 +28,7 @@ function timeSince(date)
     }
     return Math.floor(seconds) + " seconds";
 }
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

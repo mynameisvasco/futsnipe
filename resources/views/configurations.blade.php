@@ -31,6 +31,10 @@
                                     <label class="ml-2">Sell percentage</label>
                                     <input name="sell_percentage" value="{{$configuration->sell_percentage}}" class="form-control form-control-user" type="number">
                                 </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="ml-2">Telegram Channel</label>
+                                    <input name="telegram_channel" value="{{$configuration->telegram_channel}}" class="form-control form-control-user" type="text">
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-2 mt-3">

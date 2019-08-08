@@ -12,7 +12,10 @@ use App\User;
 use FUTApi\Core;
 use FUTApi\FutError;
 use Carbon\Carbon;
+use Artisan;
 use Log;
+use App\Stats;
+use Telegram;
  
 class SnipePlayers extends Command
 {
@@ -47,9 +50,23 @@ class SnipePlayers extends Command
      */
     public function handle()
     {
+        $stats = Stats::whereDate('created_at' , '=', Carbon::today()->toDateString())->first();
+
+        //Check if today's stats record is on database if not create it
+        if(empty($stats))
+        {
+            Log::info("test");
+            $stats = new Stats();
+            $stats->coins_balance = 0;
+            $stats->total_transactions = 0;
+            $stats->save();
+            $stats = Stats::whereDate('created_at' , '=', Carbon::today()->toDateString())->first();
+        }
+        
         $account = Account::where('id', $this->argument('account_id'))->first();
         $configuration = Configuration::where('user_id', $account->user_id)->first();
         $user = User::find($account->user_id);
+
         if(!isset($account)) $this->error("No account found with id " + $this->argument('account_id'));
 
         //Check if accounts needs to cooldown
@@ -60,12 +77,12 @@ class SnipePlayers extends Command
             {
                 $account->status = 3;
                 $account->save();
-                $this->info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown);
-                Log::info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown);
+                $this->info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown . ' minutes');
+                Log::info($account->email . ' is now in cooldown for ' . $configuration->snipe_cooldown . ' minutes');
                 die();
             }
             //If cooldown time passed start again
-            elseif($account->minutesRunning == $configuration->snipe_cooldown * 2)
+            elseif($account->minutesRunning > $configuration->snipe_cooldown * 2)
             {
                 //Reset the minutesRunning timer
                 $account->minutesRunning = 0;
@@ -78,6 +95,7 @@ class SnipePlayers extends Command
         }
         else
         {
+            //Try to use saved cookies to login, if not possible refresh session
             try
             {
                 $fut = new Core(
@@ -98,10 +116,6 @@ class SnipePlayers extends Command
                     $account->sessionId,
                     date("Y-m", strtotime($account->dob))
                 );
-
-                //Set account status = 1 (Accounts in use)
-                $account->status = 1;
-                $account->save();
             }
             catch(FutError $e)
             {
@@ -119,24 +133,34 @@ class SnipePlayers extends Command
                 $account->status = -1;
                 $account->status_reason = $error['reason'];
                 $account->save();
-
+                if($configuration->telegram_channel != "")
+                {
+                    Telegram::sendMessage([
+                        'chat_id' => '@'.$configuration->telegram_channel, 
+                        'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                    ]);
+                }
                 $this->error("We have an error logging in: ".$error['reason']);
                 Log::error("We have an error logging in: ".$error['reason']);
-                
+                die();
             }
-
-
-            $this->info("Logged in with success as " . $account->email);
-            Log::info("Logged in with success as " . $account->email);
 
             $startedTime = Carbon::now();
 
             //Check Trade pile
-            $tradepile = $fut->tradepile();
+            try
+            {
+                $tradepile = $fut->tradepile();
+            }
+            catch(FutError $e)
+            {
+                Artisan::call('accounts:cron ' . $account->id);
+                die();
+            }
+
             $tradepile = json_decode(json_encode($tradepile));
             foreach($tradepile->auctionInfo as $item)
             {
-                $this->info(json_encode($tradepile));
                 //If trade is closed mark as sold
                 if($item->tradeState == 'closed')
                 {
@@ -146,63 +170,110 @@ class SnipePlayers extends Command
                     }
                     catch(FutError $e)
                     {
-                        $account->status -= 2;
+                        $error = $e->GetOptions();
+                        if($error['reason'] == 'permission_denied') die();
+                        $account->status_reason = $error['reason'];
+                        $account->status = -1;
                         $account->save();
+                        if($configuration->telegram_channel != "")
+                        {
+                            Telegram::sendMessage([
+                                'chat_id' => '@'.$configuration->telegram_channel, 
+                                'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                            ]);
+                        }
+                        die();
                     }
 
                     //Save the transaction in database and update account coins
                     $transaction = new Transaction();
-                    $transaction->asset_id = $item->itemData->assetId;
-                    $transaction->name = "Needs to be fixed";
+                    $transaction->definition_id = $item->itemData->resourceId;
                     $transaction->coins = $item->buyNowPrice;
                     $transaction->type = "Sell";
                     $transaction->account_id = $account->id;
                     $transaction->save();
+
+                    //Update today's stats
+                    $stats->coins_balance += $item->buyNowPrice;
+                    $stats->total_transactions += 1;
+                    $stats->save();
+
                     $account->coins += $item->buyNowPrice;
                     $account->save();
                 }
-            }
+            }            
+            //Get all user snipe items
+            $items = Item::where('user_id', $user->id)->get();
             
-            $requestsDone = 0;
+            //If there is no items to snipe
+            if(count($items) == 0)
+            {
+                Log::info('No items to snipe on ' . $account->email);
+                die();
+            }
 
+            $requestsDone = 0;
             while($requestsDone < $configuration->rpm)
             {
-
-                if(Carbon::now()->diffInMinutes($startedTime) >= 1)
-                {
-                    $account->minutesRunning += 1;
-                    $account->save();
-                }
-
-                //Get all user snipe items
-                $items = Item::where('user_id', $user->id)->get();
-
                 //For each item in database that belongs to current user
                 foreach($items as $item)
                 {
+                    //Check if account status changed to stopped
+                    $account = Account::where('id', $this->argument('account_id'))->first();
+                    if($account->status == 0)  die();
+
                     //Check platform for max buy price
                     if($account->platform == 'xbox')
                     {
                         $randomBid = rand(14000000, 15000000);
                         $formattedBid = floor($randomBid / 1000) * 1000;
+                        if($item->type == 'consumable')
+                        {
+                            $ctype = "development";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'player')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'nationality')
+                        {
+                            $ctype = "player";
+                            $nationality = $item->asset_id;
+                            $assetId = null;
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
                         try
                         {
                             $items_results = $fut->searchAuctions(
-                                'player',
+                                $ctype,
+                                $level,
                                 null,
-                                null,
-                                $item->asset_id,
+                                $assetId,
                                 null,
                                 null,
                                 $formattedBid,
                                 null,
-                                $item->xbox_buy_bin
+                                $item->xbox_buy_bin,
+                                null,
+                                null,
+                                null,
+                                null,
+                                $nationality
                             );
                         }
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
-
+                            if($error['reason'] == 'permission_denied') die();
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -215,12 +286,18 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
-
+                            if($configuration->telegram_channel != "")
+                            {
+                                Telegram::sendMessage([
+                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                ]);
+                            }
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->xbox_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->xbox_buy_bin);
-                            
+                            die();
                         }
                     }
 
@@ -228,24 +305,53 @@ class SnipePlayers extends Command
                     {
                         $randomBid = rand(14000000, 15000000);
                         $formattedBid = floor($randomBid / 1000) * 1000;
+                        if($item->type == 'consumable')
+                        {
+                            $ctype = "development";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'player')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'nationality')
+                        {
+                            $ctype = "player";
+                            $nationality = $item->asset_id;
+                            $assetId = null;
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
                         try
                         {
                             $items_results = $fut->searchAuctions(
-                                'player',
+                                $ctype,
+                                $level,
                                 null,
-                                null,
-                                $item->asset_id,
+                                $assetId,
                                 null,
                                 null,
                                 $formattedBid,
                                 null,
-                                $item->ps_buy_bin
+                                $item->ps_buy_bin,
+                                null,
+                                null,
+                                null,
+                                null,
+                                $nationality
                             );
                         }
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
-
+                            if($error['reason'] == 'permission_denied') die();
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -258,12 +364,18 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
-                            
+                            if($configuration->telegram_channel != "")
+                            {
+                                Telegram::sendMessage([
+                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                ]);
+                            }
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->ps_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->ps_buy_bin);
-                            
+                            die();
                         }
                     }
 
@@ -271,24 +383,53 @@ class SnipePlayers extends Command
                     {
                         $randomBid = rand(14000000, 15000000);
                         $formattedBid = floor($randomBid / 1000) * 1000;
+                        if($item->type == 'consumable')
+                        {
+                            $ctype = "development";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'player')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $assetId = $item->asset_id;
+                            $level = null;
+                        }
+                        else if($item->type == 'nationality')
+                        {
+                            $ctype = "player";
+                            $nationality = $item->asset_id;
+                            $assetId = null;
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
                         try
                         {
                             $items_results = $fut->searchAuctions(
-                                'player',
+                                $ctype,
+                                $level,
                                 null,
-                                null,
-                                $item->asset_id,
+                                $assetId,
                                 null,
                                 null,
                                 $formattedBid,
                                 null,
-                                $item->pc_buy_bin
+                                $item->pc_buy_bin,
+                                null,
+                                null,
+                                null,
+                                null,
+                                $nationality
                             );
                         }
                         catch(FutError $e)
                         {
                             $error = $e->GetOptions();
-
+                            if($error['reason'] == 'permission_denied') die();
                             $account->phishingToken = null;
                             $account->sessionId = null;
                             $account->nucleusId = null;
@@ -301,15 +442,20 @@ class SnipePlayers extends Command
                             $account->status = -1;
                             $account->status_reason = $error['reason'];
                             $account->save();
-
+                            if($configuration->telegram_channel != "")
+                            {
+                                Telegram::sendMessage([
+                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                ]);
+                            }
                             $this->error($error['reason']);
                             $this->error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->pc_buy_bin);
                             Log::error($error['reason']);
                             Log::error("We have an error trying to search in market using following filters: AssetID->" .$item->asset_id ." , MaxBuy->". $item->pc_buy_bin);
-                            
+                            die();
                         }
                     }
-
                     $items_results = json_decode(json_encode($items_results));
                     if(count($items_results->auctionInfo) > 0)
                     {
@@ -324,14 +470,20 @@ class SnipePlayers extends Command
                                     $this->info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     
+
                                     //Save the transaction in database and update account coins
                                     $transaction = new Transaction();
-                                    $transaction->asset_id = $item->asset_id;
-                                    $transaction->name = $item->name;
+                                    $transaction->definition_id = $item_result->itemData->resourceId;
                                     $transaction->coins = $item_result->buyNowPrice;
                                     $transaction->type = "Buy";
                                     $transaction->account_id = $account->id;
                                     $transaction->save();
+
+                                    //Update today's stats
+                                    $stats->coins_balance -= $item_result->buyNowPrice;
+                                    $stats->total_transactions += 1;
+                                    $stats->save();
+
                                     $account->coins -= $item_result->buyNowPrice;
                                     $account->save();
 
@@ -350,8 +502,9 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->pc_sell_bin - 500, $item->xbox_sell_bin);
+                                                    $fut->sell($itemTr->itemData->id, $item->xbox_sell_bin - 100, $item->xbox_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->xbox_sell_bin);
+                                                    Log::info('We put ' . $item->name . ' on sale for ' . $item->xbox_sell_bin);
                                                 }
                                             }
                                         }
@@ -362,6 +515,13 @@ class SnipePlayers extends Command
                                             $this->error("We have an error trying to sell in market");
                                             Log::error($error['reason']);
                                             Log::error("We have an error trying to sell in market");
+                                            if($configuration->telegram_channel != "")
+                                            {
+                                                Telegram::sendMessage([
+                                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                                ]);
+                                            }
                                             die();
                                         }
                                     }
@@ -379,8 +539,9 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->pc_sell_bin - 500, $item->ps_sell_bin);
+                                                    $fut->sell($itemTr->itemData->id, $item->ps_sell_bin - 100, $item->ps_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->ps_sell_bin);
+                                                    Log::info('We put ' . $item->name . ' on sale for ' . $item->ps_sell_bin);
                                                 }
                                             }
                                         }
@@ -391,6 +552,13 @@ class SnipePlayers extends Command
                                             $this->error("We have an error trying to sell in market");
                                             Log::error($error['reason']);
                                             Log::error("We have an error trying to sell in market");
+                                            if($configuration->telegram_channel != "")
+                                            {
+                                                Telegram::sendMessage([
+                                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                                ]);
+                                            }
                                             die();
                                         }
                                     }
@@ -408,8 +576,9 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->pc_sell_bin - 500, $item->pc_sell_bin);
+                                                    $fut->sell($itemTr->itemData->id, $item->pc_sell_bin - 100, $item->pc_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->pc_sell_bin);
+                                                    Log::info('We put ' . $item->name . ' on sale for ' . $item->pc_sell_bin);
                                                 }
                                             }
                                         }
@@ -420,6 +589,13 @@ class SnipePlayers extends Command
                                             $this->error("We have an error trying to sell in market");
                                             Log::error($error['reason']);
                                             Log::error("We have an error trying to sell in market");
+                                            if($configuration->telegram_channel != "")
+                                            {
+                                                Telegram::sendMessage([
+                                                    'chat_id' => '@'.$configuration->telegram_channel, 
+                                                    'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                                ]);
+                                            }
                                             die();
                                         }
                                     }
@@ -429,12 +605,11 @@ class SnipePlayers extends Command
                                     $this->error("Not enought coins.");
                                     Log::error("Not enought coins.");
                                 }
-
                             }
                             catch(FutError $e)
                             {
                                 $error = $e->GetOptions();
-
+                                if($error['reason'] == 'permission_denied') die();
                                 $account->phishingToken = null;
                                 $account->sessionId = null;
                                 $account->nucleusId = null;
@@ -447,28 +622,32 @@ class SnipePlayers extends Command
                                 $account->status = -1;
                                 $account->status_reason = $error['reason'];
                                 $account->save();
-
+                                if($configuration->telegram_channel != "")
+                                {
+                                    Telegram::sendMessage([
+                                        'chat_id' => '@'.$configuration->telegram_channel, 
+                                        'text' => 'We have this error on '. $account->email . ' account: ' . $error['reason']
+                                    ]);
+                                }
                                 $this->error("We have an error trying to bid the selected player" . $error['reason']);
                                 Log::error("We have an error trying to bid the selected player" . $error['reason']);
-                                
+                                die();
                             }
+
+                            $requestsDone++;
+                            sleep(round(60/$configuration->rpm));
                         }
                     }
                     else
                     {
-                        $this->info("No results in market trying again in " . $configuration->rpm . " seconds.");
-                        Log::info("No results in market trying again in " . $configuration->rpm . " seconds.");
+                        $requestsDone++;
+                        sleep(round(60/$configuration->rpm));
+                        $this->info("No results in market trying again in " . round(60/$configuration->rpm) . " seconds.");
+                        Log::info("No results in market trying again in " . round(60/$configuration->rpm) . " seconds.");
                     }
-                    $account->status = 2;
-                    $account->save();
-
-                    $requestsDone++;
-                    sleep(round(60/$configuration->rpm));
                 }
             }
         }
-        //This script run once per minute so we can increase counter at the end of the script
-        $account->minutesRunning += 1;
         $account->save();
     }
 }

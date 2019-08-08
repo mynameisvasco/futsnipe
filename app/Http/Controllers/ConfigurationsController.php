@@ -34,6 +34,7 @@ class ConfigurationsController extends Controller
         $configuration->price_update_cooldown = $request->input('price_update_cooldown');
         $configuration->buy_percentage = $request->input('buy_percentage');
         $configuration->sell_percentage = $request->input('sell_percentage');
+        $configuration->telegram_channel = $request->input('telegram_channel');
         $configuration->save();
 
         return redirect('/configurations')->with('notify', array('message' => 'You updated your configuration with success', 'icon' => 'icon-check', 'type' => 'success'));
