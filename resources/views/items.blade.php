@@ -189,15 +189,17 @@
                                                     <img src="{{env('EA_PLAYERS_PIC')}}/{{$item->fifaCard->asset_id}}.png">
                                                 </div>
                                             </div>
-                                            <div class="card-badge">
-                                                <img src="{{env('EA_CLUB_BADGE')}}/{{$item->fifaCard->club}}.png" alt="Badge">
-                                            </div>
+                                            @if($item->fifaCard->club != 0)
+                                                <div class="card-badge">
+                                                    <img src="{{env('EA_CLUB_BADGE')}}/{{$item->fifaCard->club}}.png" alt="Badge">
+                                                </div>
+                                            @endif
+                                            <div class="card-rating">@if($item->fifaCard->rating > 0){{$item->fifaCard->rating}}@endif</div>
+                                            <div class="card-position">{{$item->fifaCard->position}}</div>
+                                            <div class="card-name">{{$item->fifaCard->name}}</div>
                                             <div class="card-flag">
                                                 <img src="/flags/{{$item->fifaCard->nationality}}.png" alt="Nation">
                                             </div>
-                                            <div class="card-rating">{{$item->fifaCard->rating}}</div>
-                                            <div class="card-name">{{$item->fifaCard->name}}</div>
-                                            <div class="card-position">{{$item->fifaCard->position}}</div>
                                         </div>  
                                     </div>
                                     <div class="col-md-12  mt-4">

@@ -109,6 +109,23 @@ class ItemsController extends Controller
                         $rating = 3;
                         break;
                 }
+
+                //Generate the nationality card
+                $fifacard = FifaCard::where('nationality', $itemJson->nationality_id)->first();
+                if(empty($fifacard))
+                {
+                    $fifacard = new FifaCard();
+                    $fifacard->rating = 0;
+                    $fifacard->type = $request->input('nationalityQuality');
+                    $fifacard->name = $itemJson->nationality;
+                    $fifacard->position = "";
+                    $fifacard->club = 0;
+                    $fifacard->nationality = $itemJson->nationality_id;
+                    $fifacard->asset_id = 0;
+                    $fifacard->definition_id = $itemJson->nationality_id * -1;
+                    $fifacard->save();
+                }
+
                 $item = new Item();
                 $item->asset_id = $itemJson->nationality_id;
                 $item->type = 'nationality';
@@ -121,6 +138,7 @@ class ItemsController extends Controller
                 $item->pc_sell_bin = 400;
                 $item->user_id = Auth::user()->id;
                 $item->name = $itemJson->nationality;
+                $item->definition_id = -1 * $itemJson->nationality_id; //If it is a nationality def id represents the flag id but with less sinal before the id
                 $item->save();
             }
             else
@@ -226,22 +244,7 @@ class ItemsController extends Controller
         );
 
         $fifacard = new FifaCard();
-        if($rarityId == 1)
-        {
-            if($rating >= 75) $fifacard->type = 'goldrare';
-            if($rating >= 65 && $rating <= 74) $fifacard->type = 'silverrare';
-            if($rating >= 0 && $rating <= 64) $fifacard->type = 'bronzerare';
-        }
-        else if($rarityId == 0)
-        {
-            if($rating >= 75) $fifacard->type = 'gold';
-            if($rating >= 65 && $rating <= 74) $fifacard->type = 'silver';
-            if($rating >= 0 && $rating <= 64) $fifacard->type = 'bronze';
-        }
-        else
-        {
-            $fifacard->type = $rarityIds[$rarityId];
-        }
+        $fifacard->type = Helpers::getCardType($rating, $rarityId);
         $fifacard->rating = $rating;
         $fifacard->name = $name;
         $fifacard->position = $position;

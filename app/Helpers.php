@@ -6,6 +6,55 @@ use Illuminate\Database\Eloquent\Model;
 
 class Helpers extends Model
 {
+    public const rarityIds = array(
+        '70'=> 'champions-teamoftournment',
+        '72'=> 'carnibal',
+        '12'=> 'icon',
+        '71'=> 'futurestars',
+        '51'=> 'flashback',
+        '16'=> 'futties',
+        '85'=> 'headliners',
+        '4'=> 'hero',
+        '5'=> 'toty',
+        '30'=> 'specialitem',
+        '28'=> 'award-item',
+        '66'=> 'tots',
+        '18'=> 'futchampions',
+        '1'=> 'rare',
+        '0'=> 'non-rare',
+        '8'=> 'orange',
+        '48'=> 'champions-rare',
+        '49'=> 'champions-manofmatch',
+        '50'=> 'champions-live',
+        '69'=> 'champions-sbc',
+        '3'=> 'goldif',
+        '46'=> 'europaleague-live',
+        '68'=> 'europaleague-teamoftournment',
+        '45'=> 'europaleague-manofmatch',
+        '43'=> 'premierleague-playerofmonth',
+        '32'=> 'futmas',
+        '63'=> 'sbcsummer'
+    );
+
+    public static function getCardType($rating, $rarityId)
+    {
+        if($rarityId == 1)
+        {
+            if($rating >= 75) return 'goldrare';
+            if($rating >= 65 && $rating <= 74) return 'silverrare';
+            if($rating >= 0 && $rating <= 64) return 'bronzerare';
+        }
+        else if($rarityId == 0)
+        {
+            if($rating >= 75) return 'gold';
+            if($rating >= 65 && $rating <= 74) return 'silver';
+            if($rating >= 0 && $rating <= 64) return 'bronze';
+        }
+        else
+        {
+            return $this->rarityIds[$rarityId];
+        }
+    }
     public static function getPrices($playerId)
     {
         $futbinPrice = json_decode(file_get_contents(env('FUTBIN_PRICE') . $playerId));

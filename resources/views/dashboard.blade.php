@@ -104,7 +104,7 @@
                                 @endforeach
                                 @if(count($transactions) > 0 )
                                     @foreach($transactions as $transaction)
-                                        <div class="col-12 col-lg-6 b-2 mb-4">
+                                        <div class="col-12 col-md-6 col-lg-6 b-2 mb-4">
                                             <div class="fifa-card-dashboard fifa-card mb-2 {{$transaction->fifaCard->type}}">
                                                 <div class="card-face">
                                                     <div class="card-face-inner">

@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Artisan;
 use Log;
 use App\Stats;
+use App\FifaCard;
 use Telegram;
  
 class SnipePlayers extends Command
@@ -184,6 +185,33 @@ class SnipePlayers extends Command
                         }
                         die();
                     }
+                    
+                    //Check if player card is on the database
+                    $fifacard = FifaCard::where('definition_id', $item->itemData->resourceId)->first();
+                    //If not add it
+                    if(empty($fifacard))
+                    {
+                        $queryCard = json_decode(file_get_contents('https://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject&id=' . $item->itemData->resourceId));
+                        if($queryCard->items[0]->commonName != "")
+                        {
+                            $name = $queryCard->items[0]->commonName;
+                        }
+                        else
+                        {
+                            $name = $queryCard->items[0]->lastName;
+                        }
+                        $fifacard = new FifaCard();
+                        $fifacard->rating = $item->itemData->rating;
+                        $fifacard->type = Helpers::getCardType($item->itemData->rating, $item->itemData->rareflag);
+                        $fifacard->name = $name;
+                        $fifacard->position = $item->itemData->preferredPosition;
+                        $fifacard->club = $item->itemData->teamid;
+                        $fifacard->nationality = $item->itemData->nation;
+                        $fifacard->asset_id = $item->itemData->assetId;
+                        $fifacard->definition_id = $item->itemData->resourceId;
+                        $fifacard->save();
+                    }
+
 
                     //Save the transaction in database and update account coins
                     $transaction = new Transaction();
@@ -470,6 +498,31 @@ class SnipePlayers extends Command
                                     $this->info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     
+                                     //Check if player card is on the database
+                                    $fifacard = FifaCard::where('definition_id', $item->itemData->resourceId)->first();
+                                    //If not add it
+                                    if(empty($fifacard))
+                                    {
+                                        $queryCard = json_decode(file_get_contents('https://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject&id=' . $item->itemData->resourceId));
+                                        if($queryCard->items[0]->commonName != "")
+                                        {
+                                            $name = $queryCard->items[0]->commonName;
+                                        }
+                                        else
+                                        {
+                                            $name = $queryCard->items[0]->lastName;
+                                        }
+                                        $fifacard = new FifaCard();
+                                        $fifacard->rating = $item->itemData->rating;
+                                        $fifacard->type = Helpers::getCardType($item->itemData->rating, $item->itemData->rareflag);
+                                        $fifacard->name = $name;
+                                        $fifacard->position = $item->itemData->preferredPosition;
+                                        $fifacard->club = $item->itemData->teamid;
+                                        $fifacard->nationality = $item->itemData->nation;
+                                        $fifacard->asset_id = $item->itemData->assetId;
+                                        $fifacard->definition_id = $item->itemData->resourceId;
+                                        $fifacard->save();
+                                    }
 
                                     //Save the transaction in database and update account coins
                                     $transaction = new Transaction();
