@@ -73,7 +73,8 @@ class ItemsController extends Controller
         if(isset($itemJson->isConsumable))
         {
             $item = new Item();
-            $item->asset_id = $itemJson->resourceId;
+            $item->asset_id = $itemJson->iconId;
+            $item->definition_id = $itemJson->resourceId;
             $item->type = 'consumable';
             $item->rating = 0;
             $item->xbox_buy_bin = 200;
@@ -84,6 +85,22 @@ class ItemsController extends Controller
             $item->pc_sell_bin = 400;
             $item->user_id = Auth::user()->id;
             $item->name = $itemJson->name;
+
+            //If the consumable card is not in database generate it
+            if(!isset($item->fifaCard))
+            {
+                $fifaCard = new FifaCard();
+                $fifaCard->rating = 0;
+                $fifaCard->type = $itemJson->type;
+                $fifaCard->name = $itemJson->name;
+                $fifaCard->position = "";
+                $fifaCard->club = 0;
+                $fifaCard->nationality = 0;
+                $fifaCard->asset_id = $itemJson->iconId;
+                $fifaCard->definition_id = $itemJson->resourceId;
+                $fifaCard->save();
+            }
+
             $item->save();
 
             return redirect('/items')->with('notify', array('message' => 'You added an item with success', 'icon' => 'icon-check', 'type' => 'success'));

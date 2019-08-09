@@ -390,12 +390,22 @@
 
 .card-face {
     position: absolute;
-    right: 17px;
+    right: 10px;
     top: 40px;
     overflow: hidden;
     width: 110px;
     height: 110px;
 }
+
+.card-face-consumable {
+    position: absolute;
+    right: 38px;
+    top: 35px;
+    overflow: hidden;
+    width: 110px;
+    height: 110px;
+}
+
 .card-face-inner {
     position: absolute;
     top: 0px;

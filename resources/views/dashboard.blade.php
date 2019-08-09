@@ -105,22 +105,33 @@
                                 @if(count($transactions) > 0 )
                                     @foreach($transactions as $transaction)
                                         <div class="col-12 col-md-6 col-lg-6 b-2 mb-4">
-                                            <div class="fifa-card-dashboard fifa-card mb-2 {{$transaction->fifaCard->type}}">
-                                                <div class="card-face">
-                                                    <div class="card-face-inner">
-                                                        <img src="{{env('EA_PLAYERS_PIC')}}/{{$transaction->fifaCard->asset_id}}.png">
+                                            <div class="fifa-card mb-4 {{$transaction->fifaCard->type}}">
+                                                @if($transaction->fifaCard->club == 0 && $transaction->fifaCard->nationality == 0 && $transaction->fifaCard->position == "")
+                                                    <div class="card-face-consumable">
+                                                        <div class="card-face-inner">
+                                                            <img src="/assets/consumables/{{$transaction->fifaCard->asset_id}}.png">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="card-badge">
-                                                    <img src="{{env('EA_CLUB_BADGE')}}/{{$transaction->fifaCard->club}}.png" alt="Badge">
-                                                </div>
+                                                @else
+                                                    <div class="card-face">
+                                                        <div class="card-face-inner">
+                                                            <img src="{{env('EA_PLAYERS_PIC')}}/{{$transaction->fifaCard->asset_id}}.png">
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if($transaction->fifaCard->club != 0)
+                                                    <div class="card-badge">
+                                                        <img src="{{env('EA_CLUB_BADGE')}}/{{$transaction->fifaCard->club}}.png" alt="Badge">
+                                                    </div>
+                                                @endif
+                                                <div class="card-rating">@if($transaction->fifaCard->rating > 0){{$transaction->fifaCard->rating}}@endif</div>
+                                                <div class="card-position">{{$transaction->fifaCard->position}}</div>
+                                                <div class="card-name">{{$transaction->fifaCard->name}}</div>
+                                                @if($transaction->fifaCard->nationality != 0)
                                                 <div class="card-flag">
                                                     <img src="/flags/{{$transaction->fifaCard->nationality}}.png" alt="Nation">
                                                 </div>
-                                                <div class="card-rating">{{$transaction->fifaCard->rating}}</div>
-                                                <div class="card-name">{{$transaction->fifaCard->name}}</div>
-                                                <div class="card-position">{{$transaction->fifaCard->position}}</div>
-                                            
+                                                @endif
                                             </div>  
                                             <p id="transaction{{$transaction->id}}Time" class="text-center" style="font-size:12px;" ></p>
                                             @if($transaction->type == 'Buy') 

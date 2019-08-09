@@ -499,11 +499,11 @@ class SnipePlayers extends Command
                                     Log::info("We bought ". $item->name . " for ". $item_result->buyNowPrice ." trying again in " . round(60/$configuration->rpm) . " seconds.");
                                     
                                      //Check if player card is on the database
-                                    $fifacard = FifaCard::where('definition_id', $item->itemData->resourceId)->first();
+                                    $fifacard = FifaCard::where('definition_id', $item_result->itemData->resourceId)->first();
                                     //If not add it
                                     if(empty($fifacard))
                                     {
-                                        $queryCard = json_decode(file_get_contents('https://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject&id=' . $item->itemData->resourceId));
+                                        $queryCard = json_decode(file_get_contents('https://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject&id=' . $item_result->itemData->resourceId));
                                         if($queryCard->items[0]->commonName != "")
                                         {
                                             $name = $queryCard->items[0]->commonName;
@@ -513,14 +513,14 @@ class SnipePlayers extends Command
                                             $name = $queryCard->items[0]->lastName;
                                         }
                                         $fifacard = new FifaCard();
-                                        $fifacard->rating = $item->itemData->rating;
-                                        $fifacard->type = Helpers::getCardType($item->itemData->rating, $item->itemData->rareflag);
+                                        $fifacard->rating = $item_result->itemData->rating;
+                                        $fifacard->type = Helpers::getCardType($item_result->itemData->rating, $item_result->itemData->rareflag);
                                         $fifacard->name = $name;
-                                        $fifacard->position = $item->itemData->preferredPosition;
-                                        $fifacard->club = $item->itemData->teamid;
-                                        $fifacard->nationality = $item->itemData->nation;
-                                        $fifacard->asset_id = $item->itemData->assetId;
-                                        $fifacard->definition_id = $item->itemData->resourceId;
+                                        $fifacard->position = $item_result->itemData->preferredPosition;
+                                        $fifacard->club = $item_result->itemData->teamid;
+                                        $fifacard->nationality = $item_result->itemData->nation;
+                                        $fifacard->asset_id = $item_result->itemData->assetId;
+                                        $fifacard->definition_id = $item_result->itemData->resourceId;
                                         $fifacard->save();
                                     }
 

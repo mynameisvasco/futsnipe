@@ -153,12 +153,16 @@
     </div>
 </div>
 <div class="container-fluid">
-        <div class="d-sm-flex justify-content-between align-items-center mb-4">
-            <h3 class="text-dark mb-0">Items</h3>
-            <button data-toggle="modal" data-target="#newItemModal" class="btn btn-primary btn-icon-split" type="button">
-                <span class="text-white-50 icon"><i class="far fa-plus-square"></i></span>
-                <span class="text-white text">Add items</span>
-            </button>
+        <div class="d-sm-flex row justify-content-between align-items-center mb-4">
+            <div class="col-auto">
+                <h3 class="text-dark mb-0">Items</h3>
+            </div>  
+            <div class="col-auto">
+                <button data-toggle="modal" data-target="#newItemModal" class="btn btn-primary btn-icon-split" type="button">
+                    <span class="text-white-50 icon"><i class="far fa-plus-square"></i></span>
+                    <span class="text-white text">Add items</span>
+                </button>
+            </div>
         </div>
         <div class="row">
             @if(count($items) == 0)
@@ -167,7 +171,7 @@
                 </div>
             @else
                 @foreach($items as $item)
-                    <div class="col-12 col-sm-6 col-lg-6 col-xl-3">
+                    <div class="col-12 col-sm-6 col-lg-6 col-xl-3 mb-4">
                         <div class="card h-100 shadow mb-4">
                             <div class="card-body">
                                 <div style="display: flex; justify-content: space-around">
@@ -184,11 +188,19 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-10 offset-md-1 pb-2" style="border-bottom:1px solid #EDF2F7;">
                                         <div class="fifa-card mb-4 {{$item->fifaCard->type}}">
-                                            <div class="card-face">
-                                                <div class="card-face-inner">
-                                                    <img src="{{env('EA_PLAYERS_PIC')}}/{{$item->fifaCard->asset_id}}.png">
+                                            @if($item->fifaCard->club == 0 && $item->fifaCard->nationality == 0 && $item->fifaCard->position == "")
+                                                <div class="card-face-consumable">
+                                                    <div class="card-face-inner">
+                                                        <img src="/assets/consumables/{{$item->fifaCard->asset_id}}.png">
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @else
+                                                <div class="card-face">
+                                                    <div class="card-face-inner">
+                                                        <img src="{{env('EA_PLAYERS_PIC')}}/{{$item->fifaCard->asset_id}}.png">
+                                                    </div>
+                                                </div>
+                                            @endif
                                             @if($item->fifaCard->club != 0)
                                                 <div class="card-badge">
                                                     <img src="{{env('EA_CLUB_BADGE')}}/{{$item->fifaCard->club}}.png" alt="Badge">
@@ -197,9 +209,11 @@
                                             <div class="card-rating">@if($item->fifaCard->rating > 0){{$item->fifaCard->rating}}@endif</div>
                                             <div class="card-position">{{$item->fifaCard->position}}</div>
                                             <div class="card-name">{{$item->fifaCard->name}}</div>
+                                            @if($item->fifaCard->nationality != 0)
                                             <div class="card-flag">
                                                 <img src="/flags/{{$item->fifaCard->nationality}}.png" alt="Nation">
                                             </div>
+                                            @endif
                                         </div>  
                                     </div>
                                     <div class="col-md-12  mt-4">
@@ -272,12 +286,48 @@
             let itemToEdit = JSON.parse("{{$items}}".replace(/&quot;/g, '"'))
             item = itemToEdit.find(item => item.id === id)
 
-            document.getElementById('edit-card-assetId').src = "{{env('EA_PLAYERS_PIC')}}/" + item['fifa_card']['asset_id'] + ".png"
-            document.getElementById('edit-card-club').src = "{{env('EA_CLUB_BADGE')}}/" + item['fifa_card']['club'] + ".png"
-            document.getElementById('edit-card-nationality').src = "/flags/" + item['fifa_card']['nationality'] + ".png"
+            if(item['fifa_card']['club'] != 0 && item['fifa_card']['nationality'] != 0 && item['fifa_card']['position'] != "")
+            {
+                document.getElementById('edit-card-assetId').parentElement.parentElement.classList = "card-face"
+                document.getElementById('edit-card-assetId').src = "{{env('EA_PLAYERS_PIC')}}/" + item['fifa_card']['asset_id'] + ".png"
+            }
+            else
+            {
+                document.getElementById('edit-card-assetId').parentElement.parentElement.classList = "card-face-consumable"
+                document.getElementById('edit-card-assetId').src = "/assets/consumables/" + item['fifa_card']['asset_id'] + ".png"
+            }
+            
+            if(item['fifa_card']['club'] != 0)
+            {
+                document.getElementById('edit-card-club').style.display = 'block'
+                document.getElementById('edit-card-club').src = "{{env('EA_CLUB_BADGE')}}/" + item['fifa_card']['club'] + ".png"
+            }
+            else
+            {
+                document.getElementById('edit-card-club').style.display = 'none'
+            }
+                
+            if(item['fifa_card']['nationality'] != 0)
+            {
+                document.getElementById('edit-card-nationality').style.display = 'block'
+                document.getElementById('edit-card-nationality').src = "/flags/" + item['fifa_card']['nationality'] + ".png"
+            }
+            else
+            {
+                document.getElementById('edit-card-nationality').style.display = 'none'
+            }
+
             document.getElementById('edit-card-name').innerHTML = item['fifa_card']['name'] 
             document.getElementById('edit-card-position').innerHTML = item['fifa_card']['position']
-            document.getElementById('edit-card-rating').innerHTML = item['fifa_card']['rating']  
+
+            if(item['fifa_card']['rating'] != 0)
+            {
+                document.getElementById('edit-card-rating').innerHTML = item['fifa_card']['rating'] 
+            }
+            else
+            {
+                document.getElementById('edit-card-rating').innerHTML = ""
+            }
             document.getElementById('edit-card-bg').className = "fifa-card mb-4 " + item['fifa_card']['type']  
 
             document.getElementById('editItemForm').action = "/items/"+ item['id'] + "/update"
@@ -353,7 +403,7 @@
             for(var i = 0; i < playerCardsJSON['items'].length; i++)
             {
                 let displayName = ''
-                if(playerCardsJSON['items'][i]['commonName'] != undefined) {displayName = playerCardsJSON['items'][i]['commonName']}
+                if(playerCardsJSON['items'][i]['commonName'] != "") {displayName = playerCardsJSON['items'][i]['commonName']}
                 else {displayName = playerCardsJSON['items'][i]['lastName']}
                 let type = ""
                 if(playerCardsJSON['items'][i]['rarityId'] == 0) 

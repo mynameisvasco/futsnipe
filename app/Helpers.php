@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Helpers;
 class Helpers extends Model
 {
     public const rarityIds = array(
@@ -52,7 +52,7 @@ class Helpers extends Model
         }
         else
         {
-            return $this->rarityIds[$rarityId];
+            return Helpers::rarityIds[$rarityId];
         }
     }
     public static function getPrices($playerId)
