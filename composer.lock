@@ -386,12 +386,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/futmkt/fut-api.git",
-                "reference": "7025543a7cb26afc8d75a948f63440c45c2b3301"
+                "reference": "239ec63490fbf513d95fe4a41d17b3800790d4e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/futmkt/fut-api/zipball/7025543a7cb26afc8d75a948f63440c45c2b3301",
-                "reference": "7025543a7cb26afc8d75a948f63440c45c2b3301",
+                "url": "https://api.github.com/repos/futmkt/fut-api/zipball/239ec63490fbf513d95fe4a41d17b3800790d4e4",
+                "reference": "239ec63490fbf513d95fe4a41d17b3800790d4e4",
                 "shasum": ""
             },
             "require": {
@@ -415,7 +415,7 @@
                 "fifa api",
                 "fut"
             ],
-            "time": "2019-09-25T17:17:00+00:00"
+            "time": "2019-09-25T18:18:22+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
