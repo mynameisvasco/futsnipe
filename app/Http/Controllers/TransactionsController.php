@@ -21,7 +21,7 @@ class TransactionsController extends Controller
     {
         $pageName = "Transactions";
 
-        $transactions = Transaction::with('fifaCard')->orderBy('created_at', 'DESC')->paginate(12);
+        $transactions = Transaction::with('fifaCard')->where('user_id', auth()->user()->id)->orderBy('created_at', 'DESC')->paginate(12);
 
         return view('transactions')->with('pageName', $pageName)
             ->with(['transactions' => $transactions]);
@@ -31,7 +31,7 @@ class TransactionsController extends Controller
     {
         $pageName = "Transactions";
 
-        $transactions = Transaction::whereDate('created_at', '=' , date($request->input('date')))->paginate(12);
+        $transactions = Transaction::whereDate('created_at', '=' , date($request->input('date')))->where('user_id', auth()->user()->id)->paginate(12);
 
         return view('transactions')->with('pageName', $pageName)
             ->with(['transactions' => $transactions]);

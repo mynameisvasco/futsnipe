@@ -12,7 +12,7 @@
 {
     background: url('/assets/cards/bronze.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #2b2217;
 }
@@ -21,7 +21,7 @@
 {
     background: url('/assets/cards/bronzeif.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #bb9266;
 }
@@ -30,7 +30,7 @@
 {
     background: url('/assets/cards/bronzerare.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #3a2717;
 }
@@ -39,7 +39,7 @@
 {
     background: url('/assets/cards/carnibal.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #ffe632;
 }
@@ -48,7 +48,7 @@
 {
     background: url('/assets/cards/champions-teamoftournment.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -57,7 +57,7 @@
 {
     background: url('/assets/cards/champions-manofmatch.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -66,7 +66,16 @@
 {
     background: url('/assets/cards/champions-rare.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
+    background-position: center center;
+    color: #f5f5f5;
+}
+
+.champions-nonrare
+{
+    background: url('/assets/cards/champions-nonrare.png');
+    background-repeat: no-repeat;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -75,7 +84,7 @@
 {
     background: url('/assets/cards/europaleague-manofmatch.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -84,7 +93,7 @@
 {
     background: url('/assets/cards/europaleague-teamoftournment.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -93,7 +102,7 @@
 {
     background: url('/assets/cards/europaleague-live.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f39200;
 }
@@ -102,7 +111,7 @@
 {
     background: url('/assets/cards/flashback.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #e4d7bc;
 }
@@ -111,7 +120,7 @@
 {
     background: url('/assets/cards/futchampions.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #e3cf83;
 }
@@ -120,7 +129,7 @@
 {
     background: url('/assets/cards/futmas.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -129,7 +138,7 @@
 {
     background: url('/assets/cards/futties.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f9e574;
 }
@@ -138,7 +147,7 @@
 {
     background: url('/assets/cards/futtiesnominated.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -147,7 +156,7 @@
 {
     background: url('/assets/cards/futurestars.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #c0ff36;
 }
@@ -156,7 +165,7 @@
 {
     background: url('/assets/cards/gold.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #443a22;
 }
@@ -165,7 +174,7 @@
 {
     background: url('/assets/cards/goldif.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #bb9266;
 }
@@ -174,7 +183,7 @@
 {
     background: url('/assets/cards/goldrare.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #46390c;
 }
@@ -183,7 +192,7 @@
 {
     background: url('/assets/cards/halloween.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #ff690d;
 }
@@ -192,7 +201,7 @@
 {
     background: url('/assets/cards/headliners.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #fff;
 }
@@ -201,7 +210,7 @@
 {
     background: url('/assets/cards/hero.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #cbb8f9;
 }
@@ -210,7 +219,7 @@
 {
     background: url('/assets/cards/icon.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #625217;
 }
@@ -219,7 +228,7 @@
 {
     background: url('/assets/cards/orange.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #e6e6e6;
 }
@@ -228,7 +237,7 @@
 {
     background: url('/assets/cards/premierleague-playerofmonth.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #05f1ff;
 }
@@ -237,7 +246,7 @@
 {
     background: url('/assets/cards/sbcsummer.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #f5f5f5;
 }
@@ -246,7 +255,7 @@
 {
     background: url('/assets/cards/silver.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #26292a;
 }
@@ -255,7 +264,7 @@
 {
     background: url('/assets/cards/silverif.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #b0bcc8;
 }
@@ -264,7 +273,7 @@
 {
     background: url('/assets/cards/silverrare.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #303536;
 }
@@ -273,7 +282,7 @@
 {
     background: url('/assets/cards/specialitem.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #12fcc6;
 }
@@ -282,7 +291,7 @@
 {
     background: url('/assets/cards/tots.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #eed170;
 }
@@ -291,9 +300,18 @@
 {
     background: url('/assets/cards/tots.png');
     background-repeat: no-repeat;
-    background-size: 185px 281px;
+    background-size: 217px 312px;
     background-position: center center;
     color: #ebcd5b;
+}
+
+.ones-to-watch
+{
+    background: url('/assets/cards/ones-to-watch.png');
+    background-repeat: no-repeat;
+    background-size: 217px 312px;
+    background-position: center center;
+    color: white;
 }
 
 .card-badge {

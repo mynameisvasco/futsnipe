@@ -22,7 +22,7 @@ class CreateFifaCardsTable extends Migration
             $table->bigInteger('club');
             $table->bigInteger('nationality');
             $table->bigInteger('asset_id');
-            $table->bigInteger('definition_id');
+            $table->string('definition_id');
             $table->timestamps();
         });
     }

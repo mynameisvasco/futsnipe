@@ -17,6 +17,7 @@ class CreateStatsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('coins_balance');
             $table->bigInteger('total_transactions');
+            $table->integer('user_id');
             $table->timestamps();
         });
     }

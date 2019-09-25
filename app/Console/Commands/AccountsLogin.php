@@ -77,7 +77,7 @@ class AccountsLogin extends Command
             $account->clubName = $login['mass_info']['userInfo']['clubName'];
             $account->sessionId = $login['auth']['session_id'];
             $account->coins = $login['mass_info']['userInfo']['credits'];
-            $account->tradepile_limit = $login['mass_info']['pileSizeClientData']['entries'][0]['value'];
+            $account->tradepile_limit = 100;
             $account->dob = $login['auth']['dob'];
             $account->last_login = new Carbon;
             $account->status = 2;

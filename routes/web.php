@@ -28,11 +28,13 @@ Route::get('/logout', '\App\Http\Controllers\Auth\LoginController@logout');
 //Items routes
 Route::post('/items/store', 'ItemsController@store')->name('items.store');
 Route::get('/items/players', 'ItemsController@players')->name('items.players');
-Route::get('/items/player_cards/{assetId}', 'ItemsController@playerCards')->name('items.player_cards');
+Route::get('/items/player_cards/{name}', 'ItemsController@playerCards')->name('items.player_cards');
 Route::get('/items/{id}/delete', 'ItemsController@delete')->name('items.delete');
 Route::post('/items/{id}/update', 'ItemsController@update')->name('items.update');
 Route::get('/items/consumables', 'ItemsController@consumables')->name('items.consumables');
 Route::get('/items/nationalities', 'ItemsController@nationalities')->name('items.nationalities');
+Route::get('/items/leagues', 'ItemsController@leagues')->name('items.leagues');
+Route::get('/items/clubs', 'ItemsController@clubs')->name('items.clubs');
 Route::post('/items/card/generate', 'ItemsController@generateCard')->name('items.card.generate');
 
 //Account Routes

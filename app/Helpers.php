@@ -9,7 +9,15 @@ class Helpers extends Model
     public const rarityIds = array(
         '70'=> 'champions-teamoftournment',
         '72'=> 'carnibal',
-        '12'=> 'icon',
+
+        //OTW
+        'OTW'=> 'ones-to-watch',
+        '21'=> 'ones-to-watch',
+
+        //ICON
+        'ICON'=> 'icon',
+        '12' => 'icon',
+
         '71'=> 'futurestars',
         '51'=> 'flashback',
         '16'=> 'futties',
@@ -27,31 +35,44 @@ class Helpers extends Model
         '49'=> 'champions-manofmatch',
         '50'=> 'champions-live',
         '69'=> 'champions-sbc',
+
+        //IF
+        'IF'=> 'goldif',
         '3'=> 'goldif',
+
         '46'=> 'europaleague-live',
         '68'=> 'europaleague-teamoftournment',
         '45'=> 'europaleague-manofmatch',
+
+        //POTM-EPL
+        'POTM-EPL'=> 'premierleague-playerofmonth',
         '43'=> 'premierleague-playerofmonth',
+
         '32'=> 'futmas',
+        '47'=> 'champions-nonrare',
         '63'=> 'sbcsummer'
     );
 
-    public static function getCardType($rating, $rarityId)
+    public static function getCardType($rating, $isRare, $rarityId)
     {
-        if($rarityId == 1)
+        if($rarityId == "NIF")
         {
-            if($rating >= 75) return 'goldrare';
-            if($rating >= 65 && $rating <= 74) return 'silverrare';
-            if($rating >= 0 && $rating <= 64) return 'bronzerare';
-        }
-        else if($rarityId == 0)
-        {
-            if($rating >= 75) return 'gold';
-            if($rating >= 65 && $rating <= 74) return 'silver';
-            if($rating >= 0 && $rating <= 64) return 'bronze';
+            if($isRare == "true")
+            {
+                if($rating >= 75) return 'goldrare';
+                if($rating >= 65 && $rating <= 74) return 'silverrare';
+                if($rating >= 0 && $rating <= 64) return 'bronzerare';
+            }
+            else if($isRare == "false")
+            {
+                if($rating >= 75) return 'gold';
+                if($rating >= 65 && $rating <= 74) return 'silver';
+                if($rating >= 0 && $rating <= 64) return 'bronze';
+            }
         }
         else
         {
+            echo $rarityId;
             return Helpers::rarityIds[$rarityId];
         }
     }

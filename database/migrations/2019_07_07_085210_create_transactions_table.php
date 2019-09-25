@@ -19,6 +19,7 @@ class CreateTransactionsTable extends Migration
             $table->integer('coins');
             $table->string('type');
             $table->integer('account_id');
+            $table->integer('user_id');
             $table->timestamps();
         });
     }

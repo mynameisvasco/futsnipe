@@ -29,8 +29,8 @@ class DashboardController extends Controller
     public function index()
     {
         $pageName = "Dashboard";
-        $transactions = Transaction::with('fifaCard')->orderBy('created_at', 'DESC')->limit(6)->get();
-        $stats = Stats::latest()->limit(6)->get();
+        $transactions = Transaction::with('fifaCard')->where('user_id', auth()->user()->id)->orderBy('created_at', 'DESC')->limit(6)->get();
+        $stats = Stats::latest()->limit(6)->where('user_id', auth()->user()->id)->get();
         $totalItems = count(Item::where('user_id', Auth::user()->id)->get());
         $totalAccounts = count(Account::where('user_id', Auth::user()->id)->get());
         $totalEarnings = 0;

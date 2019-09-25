@@ -11,6 +11,8 @@ use Auth;
 use App\Nationality;
 use App\Consumable;
 use App\FifaCard;
+use App\Club;
+use App\League;
 
 class ItemsController extends Controller
 {  
@@ -60,6 +62,20 @@ class ItemsController extends Controller
         return $nationalities;
     }
 
+    public function clubs()
+    {
+        $clubs = Club::all();
+
+        return $clubs;
+    }
+
+    public function leagues()
+    {
+        $leagues = League::all();
+
+        return $leagues;
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -107,7 +123,7 @@ class ItemsController extends Controller
         }
         else
         {
-            //Check if it is a player or a nationality
+            //Check if it is a nationality
             if(isset($itemJson->nationality_id))
             {
                 //Case it is a nationality rating represents the card quality (GOLD, SILVER, BRONZE or ANY)
@@ -128,14 +144,14 @@ class ItemsController extends Controller
                 }
 
                 //Generate the nationality card
-                $fifacard = FifaCard::where('nationality', $itemJson->nationality_id)->first();
+                $fifacard = FifaCard::where('name', $itemJson->nationality)->first();
                 if(empty($fifacard))
                 {
                     $fifacard = new FifaCard();
                     $fifacard->rating = 0;
                     $fifacard->type = $request->input('nationalityQuality');
                     $fifacard->name = $itemJson->nationality;
-                    $fifacard->position = "";
+                    $fifacard->position = $request->input('nationalityPosition');
                     $fifacard->club = 0;
                     $fifacard->nationality = $itemJson->nationality_id;
                     $fifacard->asset_id = 0;
@@ -155,18 +171,72 @@ class ItemsController extends Controller
                 $item->pc_sell_bin = 400;
                 $item->user_id = Auth::user()->id;
                 $item->name = $itemJson->nationality;
+                $item->position = $request->input('nationalityPosition');
                 $item->definition_id = -1 * $itemJson->nationality_id; //If it is a nationality def id represents the flag id but with less sinal before the id
+                $item->save();
+            }
+            //Check if it is a club
+            else if(isset($itemJson->club_id))
+            {
+                //Case it is a club rating represents the card quality (GOLD, SILVER, BRONZE or ANY)
+                switch($request->input('clubQuality'))
+                {
+                    case 'any':
+                        $rating = 0;
+                        break;
+                    case 'gold':
+                        $rating = 1;
+                        break;
+                    case 'silver':
+                        $rating = 2;
+                        break;
+                    case 'bronze':
+                        $rating = 3;
+                        break;
+                }
+
+                //Generate the club card
+                $fifacard = FifaCard::where('name', $itemJson->club)->first();
+                if(empty($fifacard))
+                {
+                    $fifacard = new FifaCard();
+                    $fifacard->rating = 0;
+                    $fifacard->type = $request->input('clubQuality');
+                    $fifacard->name = $itemJson->club;
+                    $fifacard->position = $request->input('clubPosition');
+                    $fifacard->position = "";
+                    $fifacard->club = $itemJson->club_id;
+                    $fifacard->nationality = 0;
+                    $fifacard->asset_id = 0;
+                    $fifacard->definition_id = 'C'.$itemJson->club_id;
+                    $fifacard->save();
+                }
+
+                $item = new Item();
+                $item->asset_id = $itemJson->club_id;
+                $item->type = 'club';
+                $item->rating = $rating;
+                $item->xbox_buy_bin = 200;
+                $item->ps_buy_bin = 200;
+                $item->pc_buy_bin = 200;
+                $item->xbox_sell_bin = 400;
+                $item->ps_sell_bin = 400;
+                $item->pc_sell_bin = 400;
+                $item->user_id = Auth::user()->id;
+                $item->name = $itemJson->club;
+                $item->position = $request->input('clubPosition');
+                $item->definition_id = 'C'.$itemJson->club_id;
                 $item->save();
             }
             else
             {
-                $prices = Helpers::getPrices($itemJson->id);
+                $prices = Helpers::getPrices($itemJson->def_id);
                 $pricesXBOX = json_decode(json_encode(Helpers::calculatePrices($prices[0], $configuration->buy_percentage, $configuration->sell_percentage)));
                 $pricesPS = json_decode(json_encode(Helpers::calculatePrices($prices[1], $configuration->buy_percentage, $configuration->sell_percentage)));
                 $pricesPC = json_decode(json_encode(Helpers::calculatePrices($prices[2], $configuration->buy_percentage, $configuration->sell_percentage)));
             
                 $item = new Item();
-                $item->asset_id = $itemJson->baseId;
+                $item->asset_id = $itemJson->player_id;
                 $item->type = 'player';
                 $item->rating = $itemJson->rating;
                 $item->xbox_buy_bin = $pricesXBOX->max_bin;
@@ -176,15 +246,8 @@ class ItemsController extends Controller
                 $item->ps_sell_bin = $pricesPS->sell_bin;
                 $item->pc_sell_bin = $pricesPC->sell_bin;
                 $item->user_id = Auth::user()->id;
-                $item->definition_id = $itemJson->id;
-                if($itemJson->commonName != "")
-                {
-                    $item->name = $itemJson->commonName;
-                }
-                else
-                {
-                    $item->name = $itemJson->lastName;
-                }
+                $item->definition_id = $itemJson->def_id;
+                $item->name = $itemJson->card_name;
                 $item->save();
             }
        
@@ -197,9 +260,9 @@ class ItemsController extends Controller
         return file_get_contents(env('EA_PLAYERS'));
     }
 
-    public function playerCards($assetId)
+    public function playerCards($name)
     {
-        return file_get_contents(env('EA_PLAYER_CARDS').'&baseid=' . $assetId);
+        return file_get_contents(env('FUTHEAD_PLAYERS'). $name);
     }
  
     public function consumables()
@@ -227,9 +290,10 @@ class ItemsController extends Controller
         $club = $request->input('club');
         $nationality = $request->input('nationality');
         $position = $request->input('position');
-        $rarityId = $request->input('rarityId');
+        $isRare = $request->input('isRare');
         $assetId = $request->input('assetId');
-
+        $rarityId = $request->input('rarityId');
+        
         $rarityIds = array(
             '70'=> 'champions-teamoftournment',
             '72'=> 'carnibal',
@@ -261,7 +325,7 @@ class ItemsController extends Controller
         );
 
         $fifacard = new FifaCard();
-        $fifacard->type = Helpers::getCardType($rating, $rarityId);
+        $fifacard->type = Helpers::getCardType($rating, $isRare, $rarityId);
         $fifacard->rating = $rating;
         $fifacard->name = $name;
         $fifacard->position = $position;

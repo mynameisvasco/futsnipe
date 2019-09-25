@@ -51,20 +51,21 @@ class SnipePlayers extends Command
      */
     public function handle()
     {
-        $stats = Stats::whereDate('created_at' , '=', Carbon::today()->toDateString())->first();
+        $account = Account::where('id', $this->argument('account_id'))->first();
+
+        $stats = Stats::whereDate('created_at' , '=', Carbon::today()->toDateString())->where('user_id', $account->user_id)->first();
 
         //Check if today's stats record is on database if not create it
         if(empty($stats))
         {
-            Log::info("test");
             $stats = new Stats();
             $stats->coins_balance = 0;
             $stats->total_transactions = 0;
+            $stats->user_id = $account->user_id;
             $stats->save();
             $stats = Stats::whereDate('created_at' , '=', Carbon::today()->toDateString())->first();
         }
-        
-        $account = Account::where('id', $this->argument('account_id'))->first();
+    
         $configuration = Configuration::where('user_id', $account->user_id)->first();
         $user = User::find($account->user_id);
 
@@ -191,6 +192,7 @@ class SnipePlayers extends Command
                     //If not add it
                     if(empty($fifacard))
                     {
+                        //TODO: UPDATE URL BELLOW TO FIFA 20 DATABASE (NOT POSSIBLE YET)
                         $queryCard = json_decode(file_get_contents('https://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject&id=' . $item->itemData->resourceId));
                         if($queryCard->items[0]->commonName != "")
                         {
@@ -219,6 +221,7 @@ class SnipePlayers extends Command
                     $transaction->coins = $item->buyNowPrice;
                     $transaction->type = "Sell";
                     $transaction->account_id = $account->id;
+                    $transaction->user_id = $account->user_id;
                     $transaction->save();
 
                     //Update today's stats
@@ -239,7 +242,6 @@ class SnipePlayers extends Command
                 Log::info('No items to snipe on ' . $account->email);
                 die();
             }
-
             $requestsDone = 0;
             while($requestsDone < $configuration->rpm)
             {
@@ -259,21 +261,39 @@ class SnipePlayers extends Command
                         {
                             $ctype = "development";
                             $nationality = null;
+                            $club = null;
                             $assetId = $item->asset_id;
                             $level = null;
+                            $position = null;
                         }
                         else if($item->type == 'player')
                         {
                             $ctype = "player";
                             $nationality = null;
-                            $assetId = $item->asset_id;
+                            $club = null;
+                            $assetId = $item->definition_id;
                             $level = null;
+                            $position = null;
                         }
                         else if($item->type == 'nationality')
                         {
                             $ctype = "player";
                             $nationality = $item->asset_id;
+                            $club = null;
                             $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
+                        else if($item->type == 'club')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $club = $item->asset_id;
+                            $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
                             if($item->rating == 0) $level = null;
                             if($item->rating == 1) $level = 'gold';
                             if($item->rating == 2) $level = 'silver';
@@ -292,8 +312,8 @@ class SnipePlayers extends Command
                                 null,
                                 $item->xbox_buy_bin,
                                 null,
-                                null,
-                                null,
+                                $club,
+                                $position,
                                 null,
                                 $nationality
                             );
@@ -337,21 +357,39 @@ class SnipePlayers extends Command
                         {
                             $ctype = "development";
                             $nationality = null;
+                            $club = null;
                             $assetId = $item->asset_id;
                             $level = null;
+                            $position = null;
                         }
                         else if($item->type == 'player')
                         {
                             $ctype = "player";
                             $nationality = null;
-                            $assetId = $item->asset_id;
+                            $club = null;
+                            $assetId = $item->definition_id;
                             $level = null;
+                            $position = null;
                         }
                         else if($item->type == 'nationality')
                         {
                             $ctype = "player";
                             $nationality = $item->asset_id;
+                            $club = null;
                             $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
+                        else if($item->type == 'club')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $club = $item->asset_id;
+                            $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
                             if($item->rating == 0) $level = null;
                             if($item->rating == 1) $level = 'gold';
                             if($item->rating == 2) $level = 'silver';
@@ -370,8 +408,8 @@ class SnipePlayers extends Command
                                 null,
                                 $item->ps_buy_bin,
                                 null,
-                                null,
-                                null,
+                                $club,
+                                $position,
                                 null,
                                 $nationality
                             );
@@ -415,21 +453,39 @@ class SnipePlayers extends Command
                         {
                             $ctype = "development";
                             $nationality = null;
+                            $club = null;
                             $assetId = $item->asset_id;
                             $level = null;
+                            $position = null;
                         }
                         else if($item->type == 'player')
                         {
                             $ctype = "player";
                             $nationality = null;
-                            $assetId = $item->asset_id;
+                            $club = null;
+                            $assetId = $item->definition_id;
                             $level = null;
+                            $position  = null;
                         }
                         else if($item->type == 'nationality')
                         {
                             $ctype = "player";
                             $nationality = $item->asset_id;
+                            $club = null;
                             $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
+                            if($item->rating == 0) $level = null;
+                            if($item->rating == 1) $level = 'gold';
+                            if($item->rating == 2) $level = 'silver';
+                            if($item->rating == 3) $level = 'bronze';
+                        }
+                        else if($item->type == 'club')
+                        {
+                            $ctype = "player";
+                            $nationality = null;
+                            $club = $item->asset_id;
+                            $assetId = null;
+                            if($item->position != "any") { $position = $item->position; } else { $position = null; } 
                             if($item->rating == 0) $level = null;
                             if($item->rating == 1) $level = 'gold';
                             if($item->rating == 2) $level = 'silver';
@@ -448,8 +504,8 @@ class SnipePlayers extends Command
                                 null,
                                 $item->pc_buy_bin,
                                 null,
-                                null,
-                                null,
+                                $club,
+                                $position,
                                 null,
                                 $nationality
                             );
@@ -530,6 +586,7 @@ class SnipePlayers extends Command
                                     $transaction->coins = $item_result->buyNowPrice;
                                     $transaction->type = "Buy";
                                     $transaction->account_id = $account->id;
+                                    $transaction->user_id = $account->user_id;
                                     $transaction->save();
 
                                     //Update today's stats
@@ -555,7 +612,8 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->xbox_sell_bin - 100, $item->xbox_sell_bin);
+                                                    if($item->xbox_sell_bin > 1100){ $minPrice = $item->xbox_sell_bin - 100;} else { $minPrice = $item->xbox_sell_bin - 100;}
+                                                    $fut->sell($itemTr->itemData->id, $minPrice, $item->xbox_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->xbox_sell_bin);
                                                     Log::info('We put ' . $item->name . ' on sale for ' . $item->xbox_sell_bin);
                                                 }
@@ -592,7 +650,8 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->ps_sell_bin - 100, $item->ps_sell_bin);
+                                                    if($item->ps_sell_bin > 1200){ $minPrice = $item->ps_sell_bin - 1000;} else { $minPrice = $item->ps_sell_bin - 100;}
+                                                    $fut->sell($itemTr->itemData->id, $minPrice, $item->ps_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->ps_sell_bin);
                                                     Log::info('We put ' . $item->name . ' on sale for ' . $item->ps_sell_bin);
                                                 }
@@ -629,7 +688,8 @@ class SnipePlayers extends Command
                                             {
                                                 if($itemTr->itemData->id == $item_result->itemData->id)
                                                 {
-                                                    $fut->sell($itemTr->itemData->id, $item->pc_sell_bin - 100, $item->pc_sell_bin);
+                                                    if($item->pc_sell_bin > 1200){ $minPrice = $item->pc_sell_bin - 1000;} else { $minPrice = $item->pc_sell_bin - 100;}
+                                                    $fut->sell($itemTr->itemData->id, $minPrice, $item->pc_sell_bin);
                                                     $this->info('We put ' . $item->name . ' on sale for ' . $item->pc_sell_bin);
                                                     Log::info('We put ' . $item->name . ' on sale for ' . $item->pc_sell_bin);
                                                 }
