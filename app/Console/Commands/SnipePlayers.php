@@ -349,7 +349,7 @@ class SnipePlayers extends Command
                         }
                     }
 
-                    if($account->platform == 'ps')
+                    if($account->platform == 'ps4')
                     {
                         $randomBid = rand(14000000, 15000000);
                         $formattedBid = floor($randomBid / 1000) * 1000;
@@ -636,7 +636,7 @@ class SnipePlayers extends Command
                                             die();
                                         }
                                     }
-                                    else if($account->platform == 'ps')
+                                    else if($account->platform == 'ps4')
                                     {
                                         try
                                         {
