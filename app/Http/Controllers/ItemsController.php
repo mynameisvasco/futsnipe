@@ -29,7 +29,7 @@ class ItemsController extends Controller
     public function index()
     {
         $pageName = 'Items';
-        $items = Item::with('fifaCard')->where('user_id')->get();
+        $items = Item::with('fifaCard')->where('user_id', auth()->user()->id)->get();
         return view('items')->with('pageName', $pageName)
             ->with('items', $items);
     }
