@@ -24,7 +24,7 @@
                             <select style="height:50px; padding:0; padding-left:10px;" name="platform" placeholder="Platform" class="form-control form-control-user">
                                 <option value="" disabled selected>Platform</option>
                                 <option value="xbox">Xbox</option>
-                                <option value="ps">Playstation</option>
+                                <option value="ps4">Playstation 4</option>
                                 <option value="pc">PC</option>
                             </select>
                         </div>
