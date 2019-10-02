@@ -148,6 +148,39 @@
                                         <label> Search by club</label>
                                         <input id="club_name" class="form-control form-control-user mb-4" oninput="updateClubList()" name="club_name" type="text" placeholder="Club name...">
                                     </div>
+                                    <div class="col-sm-5 offset-sm-1 mt-4" id="leagueInputDiv">
+                                        <label> Search by league</label>
+                                        <form action="/items/store" method="POST">
+                                            {!! csrf_field() !!}
+                                            <select class="form-control mb-1" name="item" id="leagueInput">
+                                                <option value="" disabled selected hidden>League</option>
+                                            </select>
+                                            <select class="form-control mt-2 mb-2" name="leagueQuality">
+                                                <option value="" disabled selected hidden>Quality</option>
+                                                <option value="gold">Gold</option>
+                                                <option value="silver">Silver</option>
+                                                <option value="bronze">Bronze</option>
+                                                <option value="any">Any</option>
+                                            </select>
+                                            <select class="form-control mt-2 mb-2" name="leaguePosition">
+                                                <option value="" disabled selected hidden>Position</option>
+                                                <option value="any">Any</option>
+                                                <option value="GK">GK</option>
+                                                <option value="LB">LB</option>
+                                                <option value="CB">CB</option>
+                                                <option value="RB">RB</option>
+                                                <option value="CDM">CDM</option>
+                                                <option value="CM">CM</option>
+                                                <option value="CAM">CAM</option>
+                                                <option value="RM">RM</option>
+                                                <option value="LM">LM</option>
+                                                <option value="LW">LW</option>
+                                                <option value="ST">ST</option>
+                                                <option value="RW">RW</option>
+                                            </select>
+                                            <button class="btn btn-primary mt-2" type="submit">Select</button>
+                                        </form>
+                                    </div>
                                     <div class="col-12 mt-4">
                                         <div id="results_div_players" class="row">
                                             
@@ -550,6 +583,35 @@
             for(let i = 0; i < nationalatiesJSON.length; i++)
             {
                 nationalityInput.innerHTML += `<option value='`+JSON.stringify(nationalatiesJSON[i])+`'>`+ nationalatiesJSON[i]['nationality'] +`</option>`
+            }
+        }
+
+        var leaguesJSON = ""
+        function getLeaguesList()
+        {
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            } else {  // code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function() {
+                if (this.readyState==4 && this.status==200) 
+                {
+                    leaguesJSON = JSON.parse(this.responseText)
+                    updateLeaguesList()
+                }
+            }
+            xmlhttp.open("GET","/items/leagues",true);
+            xmlhttp.send();
+        }
+        getLeaguesList()
+        function updateLeaguesList()
+        {
+           let leagueInput = document.getElementById('leagueInput')
+            for(let i = 0; i < leaguesJSON.length; i++)
+            {
+                leagueInput.innerHTML += `<option value='`+JSON.stringify(leaguesJSON[i])+`'>`+ leaguesJSON[i]['league'] +`</option>`
             }
         }
 
